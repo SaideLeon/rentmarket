@@ -1,0 +1,10 @@
+{
+  "name": "rentmarket",
+  "description": "Marketplace local de serviços e produtos para Quelimane, Moçambique. Conecte prestadores independentes, comerciantes e clientes.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
