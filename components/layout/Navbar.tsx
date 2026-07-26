@@ -115,8 +115,13 @@ export default function Navbar() {
           {/* Logo & City Badge */}
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-600 rounded-lg md:rounded-xl flex items-center justify-center text-white font-bold text-base md:text-xl shadow-xs group-hover:bg-emerald-700 transition">
-                R
+              <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden flex items-center justify-center bg-emerald-600 shadow-xs group-hover:scale-105 transition">
+                <img
+                  src="/quelimercado_icon.jpg"
+                  alt="QueliMercado Icon"
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-base md:text-xl font-bold tracking-tight text-slate-800 leading-none group-hover:text-emerald-600 transition">
