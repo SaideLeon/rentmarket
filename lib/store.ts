@@ -301,6 +301,48 @@ export function loginOrRegisterGoogleUser(data: {
   return newUser;
 }
 
+export function syncUserFromSupabaseProfile(profile: any): UserProfile {
+  initializeStore();
+  const users = getAllUsers();
+  const existingIndex = users.findIndex(
+    u => u.id === profile.id || (profile.email && u.email.toLowerCase() === profile.email.toLowerCase())
+  );
+
+  const syncedUser: UserProfile = {
+    id: profile.id,
+    name: profile.name || (profile.email ? profile.email.split('@')[0] : 'Utilizador'),
+    email: profile.email || '',
+    phone: profile.phone || '',
+    whatsapp: profile.whatsapp || profile.phone || '',
+    avatarUrl: profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.name || profile.id}`,
+    bairro: profile.bairro || QUELIMANE_BAIRROS[0],
+    city: profile.city || 'Quelimane',
+    bio: profile.bio || '',
+    role: (profile.role === 'admin' ? 'admin' : 'user') as UserRole,
+    plan: profile.plan || 'free',
+    verificationStatus: profile.verification_status || 'none',
+    documentType: profile.document_type,
+    documentNumber: profile.document_number,
+    documentUrl: profile.document_url,
+    isBanned: Boolean(profile.is_banned),
+    banReason: profile.ban_reason || undefined,
+    bannedAt: profile.banned_at || undefined,
+    bannedBy: profile.banned_by || undefined,
+    createdAt: profile.created_at || new Date().toISOString(),
+    updatedAt: profile.updated_at || new Date().toISOString()
+  };
+
+  if (existingIndex !== -1) {
+    users[existingIndex] = syncedUser;
+  } else {
+    users.push(syncedUser);
+  }
+
+  setStorage(STORE_KEYS.USERS, users);
+  setStorage(STORE_KEYS.CURRENT_USER_ID, syncedUser.id);
+  return syncedUser;
+}
+
 export function banUserStore(targetId: string, reason: string): boolean {
   const users = getAllUsers();
   const index = users.findIndex(u => u.id === targetId);

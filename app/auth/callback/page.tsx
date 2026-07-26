@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, isSupabaseConfigured } from '../../../lib/supabase';
-import { loginOrRegisterGoogleUser } from '../../../lib/store';
+import { loginOrRegisterGoogleUser, syncUserFromSupabaseProfile } from '../../../lib/store';
+import { getSupabaseProfileById } from '../../../lib/api/auth';
 import { useToast } from '../../../components/ui/Toast';
 import { Loader2, CheckCircle, AlertCircle, ShieldCheck } from 'lucide-react';
 
@@ -12,6 +13,25 @@ export default function AuthCallbackPage() {
   const { showToast } = useToast();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMsg, setErrorMsg] = useState('');
+
+  const resolveProfile = async (user: any) => {
+    const email = user.email || '';
+    const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
+    const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+
+    let supaProfile = await getSupabaseProfileById(user.id);
+    if (!supaProfile) {
+      // Retry once in case trigger is still inserting
+      await new Promise(r => setTimeout(r, 400));
+      supaProfile = await getSupabaseProfileById(user.id);
+    }
+
+    if (supaProfile) {
+      return syncUserFromSupabaseProfile(supaProfile);
+    }
+
+    return loginOrRegisterGoogleUser({ email, name, avatarUrl });
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -31,12 +51,7 @@ export default function AuthCallbackPage() {
         if (error) throw error;
 
         if (session && session.user) {
-          const user = session.user;
-          const email = user.email || '';
-          const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
-          const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-
-          const profile = loginOrRegisterGoogleUser({ email, name, avatarUrl });
+          const profile = await resolveProfile(session.user);
           if (isMounted) {
             setStatus('success');
             showToast(`Bem-vindo, ${profile.name}! Autenticado via Google Supabase.`);
@@ -48,12 +63,7 @@ export default function AuthCallbackPage() {
           // Listen for hash fragment authentication processing
           const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user && isMounted) {
-              const user = session.user;
-              const email = user.email || '';
-              const name = user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
-              const avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture;
-
-              const profile = loginOrRegisterGoogleUser({ email, name, avatarUrl });
+              const profile = await resolveProfile(session.user);
               setStatus('success');
               showToast(`Bem-vindo, ${profile.name}! Autenticado via Google Supabase.`);
               setTimeout(() => {

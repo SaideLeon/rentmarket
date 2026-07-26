@@ -43,10 +43,12 @@ import {
   resolveReport, 
   getAllUsers,
   banUserStore,
-  unbanUserStore
+  unbanUserStore,
+  syncUserFromSupabaseProfile
 } from '../../lib/store';
 import { getAllUsersFromSupabase, banUserRPC, unbanUserRPC } from '../../lib/api/admin';
 import { getSignedDocumentUrl, reviewVerificationRPC } from '../../lib/api/verification';
+import { getSupabaseProfileById } from '../../lib/api/auth';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { Ad, VerificationRequest, Report, UserProfile } from '../../lib/types';
 import { useToast } from '../../components/ui/Toast';
@@ -105,6 +107,21 @@ export default function AdminPage() {
 
   const loadAdminData = useCallback(async () => {
     initializeStore();
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          const supaProfile = await getSupabaseProfileById(session.user.id);
+          if (supaProfile) {
+            syncUserFromSupabaseProfile(supaProfile);
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao re-sincronizar sessão no admin:', err);
+      }
+    }
+
     const user = getCurrentUser();
     if (!user || user.role !== 'admin') {
       showToast('Acesso restrito a administradores do Rent Market.', 'error');
