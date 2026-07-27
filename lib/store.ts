@@ -450,7 +450,13 @@ export function getAds(options?: {
       ads = ads.filter(ad => ad.listingType === options.listingType);
     }
     if (options.featuredOnly) {
-      ads = ads.filter(ad => ad.isFeatured);
+      let featuredList = ads.filter(ad => ad.isFeatured);
+      // Fallback: If there are fewer than 4 explicitly featured ads, include popular/recent active ads
+      if (featuredList.length < 4) {
+        const remaining = ads.filter(ad => !ad.isFeatured);
+        featuredList = [...featuredList, ...remaining];
+      }
+      ads = featuredList;
     }
     if (options.minPrice !== undefined && options.minPrice !== null && !isNaN(options.minPrice)) {
       ads = ads.filter(ad => (ad.price || 0) >= options.minPrice!);
@@ -477,8 +483,46 @@ export function getAds(options?: {
       } else if (options.sortBy === 'price_desc') {
         ads.sort((a, b) => (b.price || 0) - (a.price || 0));
       } else if (options.sortBy === 'popular') {
-        ads.sort((a, b) => b.viewsCount - a.viewsCount);
+        ads.sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0));
       }
+    } else if (options.featuredOnly) {
+      // Sorting rules for featured ads:
+      // 1. Newest uploads first (creation date within 14 days or recent)
+      // 2. Otherwise ("Caso contrário"), sort by highest viewsCount (most views)
+      const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+
+      ads.sort((a, b) => {
+        // Explicit featured flag priority first
+        if (a.isFeatured !== b.isFeatured) {
+          return a.isFeatured ? -1 : 1;
+        }
+
+        const timeA = new Date(a.createdAt).getTime();
+        const timeB = new Date(b.createdAt).getTime();
+        const ageA = now - timeA;
+        const ageB = now - timeB;
+
+        const isANew = ageA <= FOURTEEN_DAYS_MS;
+        const isBNew = ageB <= FOURTEEN_DAYS_MS;
+
+        // 1. If one is recent and other is not, recent comes first
+        if (isANew && !isBNew) return -1;
+        if (!isANew && isBNew) return 1;
+
+        // 2. If both are recent, sort by newest upload date
+        if (isANew && isBNew) {
+          if (timeB !== timeA) return timeB - timeA;
+          return (b.viewsCount || 0) - (a.viewsCount || 0);
+        }
+
+        // 3. Otherwise ("Caso contrário"), sort by highest views count
+        if ((b.viewsCount || 0) !== (a.viewsCount || 0)) {
+          return (b.viewsCount || 0) - (a.viewsCount || 0);
+        }
+
+        return timeB - timeA;
+      });
     }
   }
 

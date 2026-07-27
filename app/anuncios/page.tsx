@@ -18,6 +18,8 @@ function ListingsContent() {
   const [allAds, setAllAds] = useState<Ad[]>([]);
   const [filteredAds, setFilteredAds] = useState<Ad[]>([]);
 
+  const isFeatured = searchParams?.get('featured') === 'true';
+
   // Filter state
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams?.get('cat') || '');
@@ -26,14 +28,12 @@ function ListingsContent() {
   const [selectedType, setSelectedType] = useState(searchParams?.get('type') || 'ambos');
   const [minPrice, setMinPrice] = useState(searchParams?.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams?.get('maxPrice') || '');
-  const [sortBy, setSortBy] = useState<'recent' | 'price_asc' | 'price_desc' | 'popular'>(
-    (searchParams?.get('sort') as any) || 'recent'
+  const [sortBy, setSortBy] = useState<'recent' | 'price_asc' | 'price_desc' | 'popular' | undefined>(
+    (searchParams?.get('sort') as any) || (isFeatured ? undefined : 'recent')
   );
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedAdForContact, setSelectedAdForContact] = useState<Ad | null>(null);
-
-  const isFeatured = searchParams?.get('featured') === 'true';
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -139,8 +139,8 @@ function ListingsContent() {
         setMinPrice={setMinPrice}
         maxPrice={maxPrice}
         setMaxPrice={setMaxPrice}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
+        sortBy={sortBy || 'recent'}
+        setSortBy={(val) => setSortBy(val)}
         onReset={handleResetFilters}
       />
 
