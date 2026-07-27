@@ -432,3 +432,40 @@ BEGIN
           jsonb_build_object('approved', approve, 'reason', reason));
 END;
 $$;
+
+-- 10. STORAGE BUCKETS & RLS POLICIES FOR STORAGE.OBJECTS
+-- Bucket para Anúncios (Público)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('anuncios', 'anuncios', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Bucket para Documentos de Verificação (Privado)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('documentos', 'documentos', false)
+ON CONFLICT (id) DO UPDATE SET public = false;
+
+-- Habilitar RLS em storage.objects
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- Políticas para o bucket 'anuncios' (Público)
+CREATE POLICY "Public Read Anuncios" ON storage.objects
+  FOR SELECT USING (bucket_id = 'anuncios');
+
+CREATE POLICY "Authenticated Upload Anuncios" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'anuncios' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Owner/Admin Update Anuncios" ON storage.objects
+  FOR UPDATE USING (bucket_id = 'anuncios' AND (auth.uid() = owner OR public.is_admin()));
+
+CREATE POLICY "Owner/Admin Delete Anuncios" ON storage.objects
+  FOR DELETE USING (bucket_id = 'anuncios' AND (auth.uid() = owner OR public.is_admin()));
+
+-- Políticas para o bucket 'documentos' (Privado)
+CREATE POLICY "Authenticated Upload Documentos" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'documentos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Owner or Admin Read Documentos" ON storage.objects
+  FOR SELECT USING (bucket_id = 'documentos' AND (auth.uid() = owner OR public.is_admin()));
+
+CREATE POLICY "Owner or Admin Delete Documentos" ON storage.objects
+  FOR DELETE USING (bucket_id = 'documentos' AND (auth.uid() = owner OR public.is_admin()));
