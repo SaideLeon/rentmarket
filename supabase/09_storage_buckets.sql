@@ -12,8 +12,8 @@ INSERT INTO storage.buckets (id, name, public)
 VALUES ('documentos', 'documentos', false)
 ON CONFLICT (id) DO UPDATE SET public = false;
 
--- Habilitar RLS em storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- NOTA: O RLS em storage.objects já vem habilitado por padrão pelo Supabase.
+-- Executar ALTER TABLE em storage.objects causa o erro 42501 (must be owner of table objects).
 
 -- 2. Políticas para o bucket 'anuncios' (Público)
 DROP POLICY IF EXISTS "Public Read Anuncios" ON storage.objects;

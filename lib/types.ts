@@ -122,7 +122,9 @@ export interface VerificationRequest {
   documentType: 'bi' | 'nuit' | 'licenca';
   documentNumber: string;
   documentImageUrl: string;
+  documentBackImageUrl?: string;
   documentImagePath?: string;
+  documentBackImagePath?: string;
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string;
   createdAt: string;

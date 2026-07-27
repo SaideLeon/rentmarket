@@ -34,7 +34,7 @@ import {
   Play
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { uploadProductImage } from '../../lib/supabase';
+import { uploadProductImage, isSupabaseConfigured } from '../../lib/supabase';
 import { notifyAdvertiserNewMessage } from '../../lib/gmailNotifier';
 import { 
   initializeStore, 
@@ -79,11 +79,22 @@ function DashboardContent() {
   // Verification state
   const [docType, setDocType] = useState<'bi' | 'nuit' | 'licenca'>('bi');
   const [docNumber, setDocNumber] = useState('');
-  const [docImageUrl, setDocImageUrl] = useState('');
-  const [uploadingDoc, setUploadingDoc] = useState(false);
-  const [showDocUrlInput, setShowDocUrlInput] = useState(false);
+  
+  // Front image
+  const [docFrontPath, setDocFrontPath] = useState('');
+  const [docFrontPreviewUrl, setDocFrontPreviewUrl] = useState('');
+  const [uploadingFront, setUploadingFront] = useState(false);
+  
+  // Back image (BI require front & back)
+  const [docBackPath, setDocBackPath] = useState('');
+  const [docBackPreviewUrl, setDocBackPreviewUrl] = useState('');
+  const [uploadingBack, setUploadingBack] = useState(false);
+
+  const [docPreviewModal, setDocPreviewModal] = useState<{ title: string; url: string } | null>(null);
   const [verificationReqs, setVerificationReqs] = useState<VerificationRequest[]>([]);
-  const docFileInputRef = React.useRef<HTMLInputElement | null>(null);
+  
+  const docFrontInputRef = React.useRef<HTMLInputElement | null>(null);
+  const docBackInputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Settings State
   const [name, setName] = useState('');
@@ -209,7 +220,7 @@ function DashboardContent() {
     loadDashboard();
   };
 
-  const handleDocFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDocFrontFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -223,36 +234,111 @@ function DashboardContent() {
       return;
     }
 
-    setUploadingDoc(true);
+    const localPreview = URL.createObjectURL(file);
+    setDocFrontPreviewUrl(localPreview);
+    setUploadingFront(true);
+
     try {
       const { uploadPrivateDocument } = await import('../../lib/api/verification');
       const { path } = await uploadPrivateDocument(file, user.id);
       if (path) {
-        setDocImageUrl(path);
-        showToast('Foto do documento enviada para o armazenamento privado seguro!', 'info');
+        setDocFrontPath(path);
+        showToast('Foto da frente carregada com sucesso!', 'info');
       } else {
         const fallbackUrl = await uploadProductImage(file);
-        setDocImageUrl(fallbackUrl);
-        showToast('Foto do documento carregada!', 'info');
+        setDocFrontPath(fallbackUrl);
+        setDocFrontPreviewUrl(fallbackUrl);
+        showToast('Foto da frente anexada!', 'info');
       }
     } catch (err) {
       console.error('Erro ao carregar documento:', err);
-      showToast('Erro ao processar a foto do documento.', 'error');
+      showToast('Erro ao processar a foto da frente.', 'error');
     } finally {
-      setUploadingDoc(false);
+      setUploadingFront(false);
       if (e.target) e.target.value = '';
     }
   };
 
-  const handleSubmitVerification = (e: React.FormEvent) => {
+  const handleDocBackFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type && !file.type.startsWith('image/')) {
+      showToast('Por favor selecione um ficheiro de imagem válido (JPG, PNG, WEBP).', 'error');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('A imagem do documento é demasiado grande (máximo 10MB).', 'error');
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setDocBackPreviewUrl(localPreview);
+    setUploadingBack(true);
+
+    try {
+      const { uploadPrivateDocument } = await import('../../lib/api/verification');
+      const { path } = await uploadPrivateDocument(file, user.id);
+      if (path) {
+        setDocBackPath(path);
+        showToast('Foto do verso carregada com sucesso!', 'info');
+      } else {
+        const fallbackUrl = await uploadProductImage(file);
+        setDocBackPath(fallbackUrl);
+        setDocBackPreviewUrl(fallbackUrl);
+        showToast('Foto do verso anexada!', 'info');
+      }
+    } catch (err) {
+      console.error('Erro ao carregar verso:', err);
+      showToast('Erro ao processar a foto do verso.', 'error');
+    } finally {
+      setUploadingBack(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleSubmitVerification = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!docNumber.trim()) {
       showToast('Insira o número do documento.', 'error');
       return;
     }
-    if (!docImageUrl.trim()) {
-      showToast('Por favor, faça upload ou anexe a foto do documento.', 'error');
-      return;
+
+    if (docType === 'bi') {
+      if (!docFrontPreviewUrl) {
+        showToast('Para o BI (Bilhete de Identidade), é obrigatório anexar a FRENTE do documento.', 'error');
+        return;
+      }
+      if (!docBackPreviewUrl) {
+        showToast('Para o BI (Bilhete de Identidade), é obrigatório anexar o VERSO do documento.', 'error');
+        return;
+      }
+    } else {
+      if (!docFrontPreviewUrl) {
+        showToast('Por favor, faça upload da foto do documento.', 'error');
+        return;
+      }
+    }
+
+    const frontPathVal = docFrontPath || docFrontPreviewUrl;
+    const backPathVal = docBackPath || docBackPreviewUrl;
+
+    const combinedImagePath = backPathVal ? `${frontPathVal},${backPathVal}` : frontPathVal;
+    const combinedImageUrl = docBackPreviewUrl ? `${docFrontPreviewUrl},${docBackPreviewUrl}` : docFrontPreviewUrl;
+
+    if (isSupabaseConfigured) {
+      try {
+        const { createVerificationRequestSupabase } = await import('../../lib/api/verification');
+        await createVerificationRequestSupabase({
+          userId: user.id,
+          documentType: docType,
+          documentNumber: docNumber.trim(),
+          documentImagePath: combinedImagePath
+        });
+      } catch (err) {
+        console.warn('Erro ao guardar pedido de verificação no Supabase:', err);
+      }
     }
 
     submitVerificationRequest({
@@ -261,10 +347,12 @@ function DashboardContent() {
       userPhone: user.phone,
       documentType: docType,
       documentNumber: docNumber.trim(),
-      documentImageUrl: docImageUrl.trim()
+      documentImageUrl: combinedImageUrl,
+      documentBackImageUrl: docBackPreviewUrl || undefined,
+      documentImagePath: combinedImagePath
     });
 
-    showToast('Solicitação de verificação submetida! A nossa equipa analisará o documento.');
+    showToast('Solicitação de verificação submetida! A nossa equipa analisará o seu documento.');
     loadDashboard();
   };
 
@@ -738,156 +826,316 @@ function DashboardContent() {
 
       {/* TAB 5: VERIFICAÇÃO BI / NUIT */}
       {activeTab === 'verification' && (
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 max-w-2xl mx-auto">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6 max-w-3xl mx-auto shadow-xs">
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-slate-900">Solicitar Selo Anunciante Verificado</h2>
             <p className="text-xs text-slate-500">
-              Envie o documento de identificação (BI, NUIT ou Licença) para transmitir mais segurança aos clientes em Quelimane.
+              Envie fotos nítidas do seu documento (Frente e Verso para BI) para transmissão de confiança aos clientes em Quelimane.
             </p>
           </div>
 
           {user.verificationStatus === 'verified' ? (
-            <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-2 text-emerald-900">
-              <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+            <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-2 text-emerald-900">
+              <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
               <h3 className="font-bold text-base">Identidade Verificada!</h3>
-              <p className="text-xs">O seu perfil exibe o selo de verificação da nossa equipa de moderação.</p>
+              <p className="text-xs text-emerald-800">
+                O seu perfil exibe o selo oficial de verificação da nossa equipa de moderação do Rent Market.
+              </p>
+            </div>
+          ) : user.verificationStatus === 'pending' ? (
+            <div className="p-6 bg-amber-50 rounded-2xl border border-amber-200 space-y-4 text-amber-950">
+              <div className="flex items-center gap-3">
+                <Clock className="w-8 h-8 text-amber-600 shrink-0" />
+                <div>
+                  <h3 className="font-bold text-base">Solicitação de Verificação em Análise</h3>
+                  <p className="text-xs text-amber-800 mt-0.5">
+                    A equipa de moderação está a analisar as fotografias do seu documento. O selo será atribuído em breve.
+                  </p>
+                </div>
+              </div>
+
+              {(docFrontPreviewUrl || docBackPreviewUrl) && (
+                <div className="pt-3 border-t border-amber-200 space-y-2">
+                  <span className="text-xs font-bold text-amber-900 block">Fotografias Enviadas para Validação:</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {docFrontPreviewUrl && (
+                      <div className="bg-white p-2.5 rounded-xl border border-amber-200 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <img src={docFrontPreviewUrl} alt="Frente" className="w-14 h-11 object-cover rounded-lg border border-slate-200" />
+                          <div>
+                            <span className="text-xs font-bold text-slate-800 block">Frente do Documento</span>
+                            <span className="text-[10px] text-emerald-700 font-semibold">✓ Anexado</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDocPreviewModal({ title: 'Frente Enviada', url: docFrontPreviewUrl })}
+                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold rounded-lg transition flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3" /> Ver
+                        </button>
+                      </div>
+                    )}
+                    {docBackPreviewUrl && (
+                      <div className="bg-white p-2.5 rounded-xl border border-amber-200 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <img src={docBackPreviewUrl} alt="Verso" className="w-14 h-11 object-cover rounded-lg border border-slate-200" />
+                          <div>
+                            <span className="text-xs font-bold text-slate-800 block">Verso do Documento</span>
+                            <span className="text-[10px] text-emerald-700 font-semibold">✓ Anexado</span>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDocPreviewModal({ title: 'Verso Enviado', url: docBackPreviewUrl })}
+                          className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold rounded-lg transition flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3" /> Ver
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
-            <form onSubmit={handleSubmitVerification} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Tipo de Documento:</label>
-                <select
-                  value={docType}
-                  onChange={(e: any) => setDocType(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold"
-                >
-                  <option value="bi">BI (Bilhete de Identidade)</option>
-                  <option value="nuit">NUIT</option>
-                  <option value="licenca">Licença Comercial / Alvará</option>
-                </select>
+            <form onSubmit={handleSubmitVerification} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Tipo de Documento:</label>
+                  <select
+                    value={docType}
+                    onChange={(e: any) => setDocType(e.target.value)}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold"
+                  >
+                    <option value="bi">BI (Bilhete de Identidade - Frente e Verso)</option>
+                    <option value="nuit">NUIT (Documento de Identificação Fiscal)</option>
+                    <option value="licenca">Licença Comercial / Alvará</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Número do Documento:</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: 040123456789A"
+                    value={docNumber}
+                    onChange={(e) => setDocNumber(e.target.value)}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Número do Documento:</label>
-                <input
-                  type="text"
-                  placeholder="Ex: 040123456789A"
-                  value={docNumber}
-                  onChange={(e) => setDocNumber(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium"
-                  required
-                />
-              </div>
+              {/* Document Image Upload Inputs & Live Previews */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-emerald-600" />
+                    <span>
+                      {docType === 'bi' 
+                        ? 'Fotografias do BI (Obrigatório: Anexar a FRENTE e o VERSO do BI)' 
+                        : 'Fotografias ou Cópias do Documento'}
+                    </span>
+                  </label>
+                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    {docType === 'bi' ? '2 Imagens Requeridas' : 'Pré-visualização Ativa'}
+                  </span>
+                </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Foto ou Cópia do Documento (BI / NUIT / Licença):
-                </label>
-
-                {/* Hidden file input for selecting photo from device */}
+                {/* Hidden File Inputs */}
                 <input
-                  ref={docFileInputRef}
+                  ref={docFrontInputRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={handleDocFileSelect}
+                  onChange={handleDocFrontFileSelect}
+                />
+                <input
+                  ref={docBackInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleDocBackFileSelect}
                 />
 
-                {docImageUrl ? (
-                  <div className="relative rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 p-3 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative w-20 h-16 bg-slate-200 rounded-xl overflow-hidden shrink-0 border border-slate-300">
-                        <img
-                          src={docImageUrl}
-                          alt="Documento"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Foto Anexada com Sucesso
-                        </p>
-                        <p className="text-[11px] text-slate-500">
-                          Pronta para ser enviada à moderação.
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => docFileInputRef.current?.click()}
-                        className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition"
-                      >
-                        Substituir Foto
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDocImageUrl('')}
-                        className="p-1.5 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition"
-                        title="Remover foto"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => docFileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl p-6 text-center cursor-pointer transition space-y-2 group"
-                  >
-                    {uploadingDoc ? (
-                      <div className="flex flex-col items-center space-y-2 py-2">
-                        <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                        <p className="text-xs font-semibold text-slate-600">A processar fotografia do dispositivo...</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* SLOT 1: FRENTE DO DOCUMENTO */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-slate-700 block">
+                      1. {docType === 'bi' ? 'Frente do BI' : 'Documento Principal'} (Obrigatório)
+                    </span>
+
+                    {docFrontPreviewUrl ? (
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-3 shadow-xs">
+                        <div className="relative aspect-4/3 w-full bg-slate-900 rounded-xl overflow-hidden border border-slate-200 group">
+                          <img
+                            src={docFrontPreviewUrl}
+                            alt="Frente do Documento"
+                            className="w-full h-full object-contain"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setDocPreviewModal({ title: docType === 'bi' ? 'Frente do BI' : 'Documento Principal', url: docFrontPreviewUrl })}
+                            className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-xs"
+                          >
+                            <Eye className="w-4 h-4" /> Ampliar / Ver Pré-visualização
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Foto Anexada com Sucesso
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setDocPreviewModal({ title: docType === 'bi' ? 'Frente do BI' : 'Documento Principal', url: docFrontPreviewUrl })}
+                              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition flex items-center gap-1"
+                              title="Ver foto inteira"
+                            >
+                              <Eye className="w-3 h-3" /> Ver
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => docFrontInputRef.current?.click()}
+                              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition"
+                            >
+                              Substituir
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setDocFrontPath(''); setDocFrontPreviewUrl(''); }}
+                              className="p-1 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition"
+                              title="Remover foto"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ) : (
-                      <>
-                        <div className="w-12 h-12 bg-emerald-100 group-hover:bg-emerald-200 text-emerald-700 rounded-full flex items-center justify-center mx-auto transition">
-                          <Upload className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <p className="text-xs sm:text-sm font-bold text-slate-800">
-                            Carregar Foto do Dispositivo (Galeria / Ficheiros)
-                          </p>
-                          <p className="text-[11px] text-slate-500 mt-0.5">
-                            Clique aqui para selecionar a foto do seu BI/NUIT guardada no telemóvel ou computador
-                          </p>
-                        </div>
-                      </>
+                      <div
+                        onClick={() => docFrontInputRef.current?.click()}
+                        className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl p-5 text-center cursor-pointer transition space-y-2 group"
+                      >
+                        {uploadingFront ? (
+                          <div className="flex flex-col items-center space-y-2 py-4">
+                            <Loader2 className="w-7 h-7 text-emerald-600 animate-spin" />
+                            <p className="text-xs font-semibold text-slate-600">A carregar foto da frente...</p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="w-10 h-10 bg-emerald-100 group-hover:bg-emerald-200 text-emerald-700 rounded-full flex items-center justify-center mx-auto transition">
+                              <Upload className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-slate-800">
+                                Carregar Foto da Frente {docType === 'bi' ? 'do BI' : ''}
+                              </p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                Clique para selecionar a imagem da frente do documento
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
 
-                {/* Optional URL Toggle */}
-                <div className="mt-2 text-right">
-                  <button
-                    type="button"
-                    onClick={() => setShowDocUrlInput(!showDocUrlInput)}
-                    className="text-[11px] font-semibold text-emerald-700 hover:underline inline-flex items-center gap-1"
-                  >
-                    <LinkIcon className="w-3 h-3" />
-                    {showDocUrlInput ? 'Ocultar introdução manual por URL' : 'Ou colar link da foto (opcional)'}
-                  </button>
-                </div>
+                  {/* SLOT 2: VERSO DO DOCUMENTO */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-bold text-slate-700 block">
+                      2. {docType === 'bi' ? 'Verso do BI (Obrigatório)' : 'Verso ou Segunda Página (Opcional)'}
+                    </span>
 
-                {showDocUrlInput && (
-                  <div className="mt-2 space-y-1">
-                    <input
-                      type="text"
-                      placeholder="https://exemplo.com/foto-documento.jpg"
-                      value={docImageUrl}
-                      onChange={(e) => setDocImageUrl(e.target.value)}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium"
-                    />
+                    {docBackPreviewUrl ? (
+                      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-3 shadow-xs">
+                        <div className="relative aspect-4/3 w-full bg-slate-900 rounded-xl overflow-hidden border border-slate-200 group">
+                          <img
+                            src={docBackPreviewUrl}
+                            alt="Verso do Documento"
+                            className="w-full h-full object-contain"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setDocPreviewModal({ title: docType === 'bi' ? 'Verso do BI' : 'Verso do Documento', url: docBackPreviewUrl })}
+                            className="absolute inset-0 bg-slate-950/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white font-bold text-xs gap-1.5 backdrop-blur-xs"
+                          >
+                            <Eye className="w-4 h-4" /> Ampliar / Ver Pré-visualização
+                          </button>
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Verso Anexado com Sucesso
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setDocPreviewModal({ title: docType === 'bi' ? 'Verso do BI' : 'Verso do Documento', url: docBackPreviewUrl })}
+                              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition flex items-center gap-1"
+                              title="Ver foto inteira"
+                            >
+                              <Eye className="w-3 h-3" /> Ver
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => docBackInputRef.current?.click()}
+                              className="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-lg transition"
+                            >
+                              Substituir
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { setDocBackPath(''); setDocBackPreviewUrl(''); }}
+                              className="p-1 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition"
+                              title="Remover verso"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => docBackInputRef.current?.click()}
+                        className="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl p-5 text-center cursor-pointer transition space-y-2 group"
+                      >
+                        {uploadingBack ? (
+                          <div className="flex flex-col items-center space-y-2 py-4">
+                            <Loader2 className="w-7 h-7 text-emerald-600 animate-spin" />
+                            <p className="text-xs font-semibold text-slate-600">A carregar foto do verso...</p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="w-10 h-10 bg-emerald-100 group-hover:bg-emerald-200 text-emerald-700 rounded-full flex items-center justify-center mx-auto transition">
+                              <Upload className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-slate-800">
+                                Carregar Foto do Verso {docType === 'bi' ? 'do BI' : ''}
+                              </p>
+                              <p className="text-[11px] text-slate-500 mt-0.5">
+                                {docType === 'bi' 
+                                  ? 'Obrigatório para a verificação do BI' 
+                                  : 'Opcional se o documento tiver verso'}
+                              </p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition"
+                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2"
               >
-                Enviar Documento à Moderação
+                <ShieldCheck className="w-5 h-5" />
+                <span>Enviar Documentos para Verificação</span>
               </button>
             </form>
           )}
@@ -981,6 +1229,41 @@ function DashboardContent() {
           }}
           onSuccess={loadDashboard}
         />
+      )}
+
+      {/* User Document Preview Modal */}
+      {docPreviewModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl relative animate-fade-in">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-emerald-600" />
+                <h3 className="font-bold text-slate-900 text-sm">{docPreviewModal.title} - Pré-visualização</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDocPreviewModal(null)}
+                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-100 font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="aspect-4/3 w-full bg-slate-900 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-200">
+              <img src={docPreviewModal.url} alt={docPreviewModal.title} className="w-full h-full object-contain" />
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setDocPreviewModal(null)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>
