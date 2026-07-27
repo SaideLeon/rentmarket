@@ -117,10 +117,9 @@ export default function Navbar() {
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 group">
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden flex items-center justify-center bg-emerald-600 shadow-xs group-hover:scale-105 transition">
                 <img
-                  src="/quelimercado_icon.jpg"
-                  alt="QueliMercado Icon"
+                  src="/icon.svg"
+                  alt="QueliMercado Logo SVG"
                   className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
                 />
               </div>
               <div className="flex flex-col">

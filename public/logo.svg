@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 120" width="100%" height="100%">
+  <defs>
+    <!-- Background / Icon Gradient -->
+    <linearGradient id="logoBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <linearGradient id="logoSunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <linearGradient id="logoBagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F0FDF4" />
+    </linearGradient>
+
+    <filter id="logoShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#022C22" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Left Side Emblem Icon (100x100 box at x=10, y=10) -->
+  <g transform="translate(10, 10)">
+    <rect width="100" height="100" rx="26" fill="url(#logoBgGrad)" filter="url(#logoShadow)" />
+    
+    <!-- Sun Ray Accent -->
+    <circle cx="50" cy="35" r="18" fill="url(#logoSunGrad)" opacity="0.9" />
+
+    <!-- Shopping Bag Handle -->
+    <path d="M38 40 C38 28, 62 28, 62 40 L62 44 L38 44 Z" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+    
+    <!-- Shopping Bag Body -->
+    <path d="M28 43 L72 43 C75 43, 77 45, 76 48 L71 82 C70 85, 67 88, 64 88 L36 88 C33 88, 30 85, 29 82 L24 48 C23 45, 25 43, 28 43 Z" fill="url(#logoBagGrad)" />
+
+    <!-- Palm Frond on Bag -->
+    <path d="M50 50 C57 56, 65 62, 67 74 C59 74, 53 68, 50 60 C47 68, 41 74, 33 74 C35 62, 43 56, 50 50 Z" fill="#059669" opacity="0.9" />
+    <path d="M50 50 L50 82" stroke="#047857" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Q Tail -->
+    <path d="M61 76 L70 85 C72 87, 74 87, 76 85 C78 83, 78 81, 76 79 L67 70 Z" fill="#F59E0B" />
+  </g>
+
+  <!-- Brand Name Typography -->
+  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+    <!-- "Queli" in Bold Emerald -->
+    <text x="130" y="65" font-size="44" font-weight="800" fill="#0F172A" letter-spacing="-1">
+      Queli<tspan fill="#059669">Mercado</tspan>
+    </text>
+
+    <!-- Subtitle / Location Badge -->
+    <text x="132" y="92" font-size="15" font-weight="600" fill="#64748B" letter-spacing="1.5">
+      RENT &amp; MARKETPLACE • QUELIMANE 🇲🇿
+    </text>
+  </g>
+</svg>

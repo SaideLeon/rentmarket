@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+
+    <!-- Sun / Accent Gradient -->
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+
+    <linearGradient id="bagGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F0FDF4" />
+    </linearGradient>
+
+    <!-- Soft Drop Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#022C22" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Rounded Squircle Badge Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+
+  <!-- Tropical Sun Ray Accent -->
+  <circle cx="256" cy="180" r="90" fill="url(#sunGrad)" opacity="0.9" />
+
+  <!-- Stylized Palm Fronds / Sun Rays -->
+  <g fill="url(#sunGrad)" opacity="0.85">
+    <path d="M256 70 C256 70, 266 110, 256 130 C246 110, 256 70, 256 70 Z" />
+    <path d="M180 100 C180 100, 210 130, 215 148 C195 138, 180 100, 180 100 Z" />
+    <path d="M332 100 C332 100, 317 138, 297 148 C302 130, 332 100, 332 100 Z" />
+  </g>
+
+  <!-- Main Emblem Container with Filter Shadow -->
+  <g filter="url(#shadow)">
+    <!-- Shopping Bag Handle (Integrated Q-Curve) -->
+    <path d="M192 200 C192 145, 320 145, 320 200 L320 220 L192 220 Z" fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linecap="round" />
+    
+    <!-- Inner Handle Accent -->
+    <path d="M216 200 C216 168, 296 168, 296 200" fill="none" stroke="#F59E0B" stroke-width="14" stroke-linecap="round" />
+
+    <!-- Shopping Bag Body with Curved Cutouts (Forming 'Q' Shape) -->
+    <path d="M140 215 L372 215 C386 215, 396 227, 393 241 L365 410 C362 426, 348 438, 331 438 L181 438 C164 438, 150 426, 147 410 L119 241 C116 227, 126 215, 140 215 Z" fill="url(#bagGrad)" />
+
+    <!-- Zambézia Palm Leaf Overlay on Bag Surface (Emerald Accent) -->
+    <path d="M256 250 C290 280, 330 310, 340 370 C300 370, 270 340, 256 300 C242 340, 212 370, 172 370 C182 310, 222 280, 256 250 Z" fill="#059669" opacity="0.9" />
+    <path d="M256 250 L256 410" stroke="#047857" stroke-width="8" stroke-linecap="round" />
+
+    <!-- Q Tail Accent on the Bag -->
+    <path d="M310 380 L355 425 C363 433, 375 433, 383 425 C391 417, 391 405, 383 397 L338 352 Z" fill="#F59E0B" />
+  </g>
+</svg>

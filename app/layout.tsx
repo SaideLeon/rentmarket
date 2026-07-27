@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   title: 'Rent Market - Anúncios, Alugueres, Serviços e Produtos em Quelimane, Moçambique',
   description: 'Conecte-se diretamente com eletricistas, cabeleireiros, explicadores, costureiras, vendedores de peixe fresco, capulanas e muito mais na cidade de Quelimane, Zambézia.',
   icons: {
-    icon: '/quelimercado_icon.jpg',
-    apple: '/quelimercado_icon.jpg'
+    icon: '/icon.svg',
+    apple: '/icon.svg'
   }
 };
 
