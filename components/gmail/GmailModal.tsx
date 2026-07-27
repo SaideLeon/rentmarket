@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Mail, 
@@ -47,6 +48,15 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
   const [messages, setMessages] = useState<GmailMessageSummary[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [gmailAddress, setGmailAddress] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   useEffect(() => {
     const unsubscribe = initAuth(
@@ -180,9 +190,11 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[80] bg-slate-950/70 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex min-h-full items-center justify-center">
-      <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[90vh] my-auto flex flex-col border border-slate-100 animate-in fade-in zoom-in-95 duration-200 overflow-hidden">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] bg-slate-950/75 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-center justify-center min-h-screen">
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-xl w-full max-h-[85vh] sm:max-h-[90vh] my-auto flex flex-col border border-slate-100 animate-in fade-in zoom-in-95 duration-200 overflow-hidden shrink-0">
         
         {/* Header */}
         <div className="shrink-0 bg-slate-900 text-white p-4 sm:p-5 flex items-center justify-between">
@@ -439,6 +451,7 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

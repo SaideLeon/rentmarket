@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Phone, 
@@ -45,6 +46,15 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
     : `https://wa.me/258${cleanWhatsappNumber}?text=${encodeURIComponent(`Olá! Vi o seu anúncio "${ad.title}" no Rent Market.`)}`;
 
   const [notifyViaGmail, setNotifyViaGmail] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   const handleSendInAppMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,8 +103,10 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex min-h-full items-center justify-center">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9990] bg-slate-900/60 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-center justify-center min-h-screen">
       <div className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] my-auto flex flex-col overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Modal Header */}
@@ -289,6 +301,7 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
           initialBody={`Olá ${ad.user?.name || 'Anunciante'},\n\nEstou interessado no seu anúncio "${ad.title}" disponível no Rent Market.\n\nGostaria de obter mais detalhes sobre o artigo e condições de entrega.\n\nObrigado.`}
         />
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
