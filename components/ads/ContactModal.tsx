@@ -49,9 +49,10 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
     document.body.style.overflow = 'hidden';
     return () => {
+      clearTimeout(timer);
       document.body.style.overflow = '';
     };
   }, []);

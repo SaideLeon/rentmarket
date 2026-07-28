@@ -51,9 +51,10 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
     document.body.style.overflow = 'hidden';
     return () => {
+      clearTimeout(timer);
       document.body.style.overflow = '';
     };
   }, []);
