@@ -21,6 +21,23 @@ import {
   INITIAL_SETTINGS,
   QUELIMANE_BAIRROS 
 } from './data/initialData';
+import { isSupabaseConfigured, supabase } from './supabase';
+import { 
+  getAdsFromSupabase, 
+  createAdInSupabase, 
+  updateAdInSupabase, 
+  deleteAdFromSupabase, 
+  reviewAdRPC, 
+  boostAdRPC 
+} from './api/ads';
+import { getMessagesFromSupabase, sendMessageToSupabase } from './api/messages';
+import { getUserReviewsFromSupabase, addReviewToSupabase } from './api/reviews';
+import { getFavoritesFromSupabase, toggleFavoriteInSupabase, isFavoriteInSupabase } from './api/favorites';
+import { submitReportToSupabase, getReportsFromSupabase, updateReportStatusInSupabase } from './api/reports';
+import { getNotificationsFromSupabase, addNotificationToSupabase, markNotificationReadInSupabase } from './api/notifications';
+import { getSettingsFromSupabase, updateSettingsInSupabase } from './api/settings';
+import { updateOwnProfileInSupabase } from './api/profile';
+import { getAllUsersFromSupabase, banUserRPC, unbanUserRPC } from './api/admin';
 
 const STORE_KEYS = {
   USERS: 'mq_users',
@@ -63,7 +80,6 @@ export function initializeStore() {
   if (!localStorage.getItem(STORE_KEYS.USERS) || existingUsers.length === 0) {
     setStorage(STORE_KEYS.USERS, INITIAL_USERS);
   } else {
-    // Sync initial sample users if missing or outdated
     let usersUpdated = false;
     const userMap = new Map(existingUsers.map(u => [u.id, u]));
 
@@ -71,20 +87,6 @@ export function initializeStore() {
       const existing = userMap.get(iu.id);
       if (!existing) {
         userMap.set(iu.id, iu);
-        usersUpdated = true;
-      } else if (
-        existing.name !== iu.name ||
-        existing.phone !== iu.phone ||
-        existing.whatsapp !== iu.whatsapp ||
-        existing.bio !== iu.bio
-      ) {
-        userMap.set(iu.id, {
-          ...existing,
-          name: iu.name,
-          phone: iu.phone,
-          whatsapp: iu.whatsapp,
-          bio: iu.bio
-        });
         usersUpdated = true;
       }
     });
@@ -96,63 +98,13 @@ export function initializeStore() {
 
   if (localStorage.getItem(STORE_KEYS.CURRENT_USER_ID) === null) {
     setStorage(STORE_KEYS.CURRENT_USER_ID, '');
-  } else {
-    const currentUserId = getStorage<string>(STORE_KEYS.CURRENT_USER_ID, '');
-    if (currentUserId === 'usr_delcio') {
-      setStorage(STORE_KEYS.CURRENT_USER_ID, '');
-    }
   }
 
   const existingAds = getStorage<Ad[]>(STORE_KEYS.ADS, []);
   if (!localStorage.getItem(STORE_KEYS.ADS) || existingAds.length === 0) {
     setStorage(STORE_KEYS.ADS, INITIAL_ADS);
-  } else {
-    // Sync demo ads to ensure new organized ads and realistic photos exist
-    let adsUpdated = false;
-    const adMap = new Map(existingAds.map(ad => [ad.id, ad]));
-
-    ['ad_3', 'ad_4', 'ad_9', 'ad_10'].forEach(deletedId => {
-      if (adMap.has(deletedId)) {
-        adMap.delete(deletedId);
-        adsUpdated = true;
-      }
-    });
-
-    INITIAL_ADS.forEach(ia => {
-      const existing = adMap.get(ia.id);
-      if (!existing) {
-        adMap.set(ia.id, ia);
-        adsUpdated = true;
-      } else if (
-        existing.title !== ia.title ||
-        existing.userId !== ia.userId ||
-        existing.coverImage !== ia.coverImage ||
-        existing.phone !== ia.phone ||
-        existing.whatsapp !== ia.whatsapp
-      ) {
-        adMap.set(ia.id, {
-          ...existing,
-          title: ia.title,
-          userId: ia.userId,
-          coverImage: ia.coverImage,
-          images: ia.images,
-          description: ia.description,
-          phone: ia.phone,
-          whatsapp: ia.whatsapp,
-          price: ia.price,
-          bairro: ia.bairro,
-          categoryName: ia.categoryName,
-          categoryId: ia.categoryId,
-          subcategory: ia.subcategory
-        });
-        adsUpdated = true;
-      }
-    });
-
-    if (adsUpdated) {
-      setStorage(STORE_KEYS.ADS, Array.from(adMap.values()));
-    }
   }
+
   if (!localStorage.getItem(STORE_KEYS.CATEGORIES)) {
     setStorage(STORE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
   }
@@ -160,25 +112,10 @@ export function initializeStore() {
     setStorage(STORE_KEYS.REVIEWS, INITIAL_REVIEWS);
   }
   if (!localStorage.getItem(STORE_KEYS.MESSAGES)) {
-    setStorage(STORE_KEYS.MESSAGES, [
-      {
-        id: 'msg_1',
-        adId: 'ad_1',
-        adTitle: 'Eletricista Residencial e Comercial',
-        senderId: 'usr_amina',
-        senderName: 'Amina Mussa',
-        receiverId: 'usr_delcio',
-        receiverName: 'Délcio Langa',
-        content: 'Olá Sr. Délcio, está disponível para fazer uma instalação amanhã no bairro Brandão?',
-        read: false,
-        createdAt: '2026-07-24T15:30:00Z'
-      }
-    ]);
+    setStorage(STORE_KEYS.MESSAGES, []);
   }
   if (!localStorage.getItem(STORE_KEYS.FAVORITES)) {
-    setStorage(STORE_KEYS.FAVORITES, [
-      { id: 'fav_1', userId: 'usr_delcio', adId: 'ad_2', createdAt: '2026-07-20T10:00:00Z' }
-    ]);
+    setStorage(STORE_KEYS.FAVORITES, []);
   }
   if (!localStorage.getItem(STORE_KEYS.REPORTS)) {
     setStorage(STORE_KEYS.REPORTS, []);
@@ -187,21 +124,38 @@ export function initializeStore() {
     setStorage(STORE_KEYS.VERIFICATIONS, []);
   }
   if (!localStorage.getItem(STORE_KEYS.NOTIFICATIONS)) {
-    setStorage(STORE_KEYS.NOTIFICATIONS, [
-      {
-        id: 'notif_1',
-        userId: 'usr_delcio',
-        title: 'Anúncio Aprovado!',
-        message: 'O seu anúncio de Eletricista Residencial foi aprovado e já está público.',
-        type: 'ad_approved',
-        read: false,
-        link: '/anuncio/ad_1',
-        createdAt: '2026-07-24T08:00:00Z'
-      }
-    ]);
+    setStorage(STORE_KEYS.NOTIFICATIONS, []);
   }
   if (!localStorage.getItem(STORE_KEYS.SETTINGS)) {
     setStorage(STORE_KEYS.SETTINGS, INITIAL_SETTINGS);
+  }
+
+  // Trigger background sync with Supabase when configured
+  if (isSupabaseConfigured) {
+    syncStoreWithSupabase();
+  }
+}
+
+export async function syncStoreWithSupabase() {
+  if (!isSupabaseConfigured) return;
+  try {
+    const [ads, users, settings] = await Promise.all([
+      getAdsFromSupabase({ status: 'all' }),
+      getAllUsersFromSupabase(),
+      getSettingsFromSupabase()
+    ]);
+
+    if (ads && ads.length > 0) {
+      setStorage(STORE_KEYS.ADS, ads);
+    }
+    if (users && users.length > 0) {
+      setStorage(STORE_KEYS.USERS, users);
+    }
+    if (settings) {
+      setStorage(STORE_KEYS.SETTINGS, settings);
+    }
+  } catch (err) {
+    console.warn('Erro na sincronização em segundo plano com Supabase:', err);
   }
 }
 
@@ -247,7 +201,7 @@ export function registerUser(data: {
     avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300`,
     bairro: data.bairro || QUELIMANE_BAIRROS[0],
     city: 'Quelimane',
-    bio: data.bio || 'Utilizador do Rent Market',
+    bio: data.bio || 'Utilizador do QueliMercado',
     role: data.role || 'user',
     plan: 'free',
     verificationStatus: 'none',
@@ -258,6 +212,19 @@ export function registerUser(data: {
   users.push(newUser);
   setStorage(STORE_KEYS.USERS, users);
   setStorage(STORE_KEYS.CURRENT_USER_ID, newUser.id);
+
+  if (isSupabaseConfigured) {
+    updateOwnProfileInSupabase(newUser.id, {
+      name: newUser.name,
+      phone: newUser.phone,
+      whatsapp: newUser.whatsapp,
+      bio: newUser.bio,
+      avatarUrl: newUser.avatarUrl,
+      bairro: newUser.bairro,
+      city: newUser.city
+    });
+  }
+
   return newUser;
 }
 
@@ -287,7 +254,7 @@ export function loginOrRegisterGoogleUser(data: {
     avatarUrl: data.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300',
     bairro: QUELIMANE_BAIRROS[0],
     city: 'Quelimane',
-    bio: 'Conta iniciada via Google (Supabase)',
+    bio: 'Conta iniciada via Google',
     role: 'user',
     plan: 'free',
     verificationStatus: 'none',
@@ -355,7 +322,6 @@ export function banUserStore(targetId: string, reason: string): boolean {
     };
     setStorage(STORE_KEYS.USERS, users);
 
-    // Reject active/pending ads of banned user
     const ads = getStorage<Ad[]>(STORE_KEYS.ADS, []);
     const updatedAds = ads.map(a => {
       if (a.userId === targetId && (a.status === 'active' || a.status === 'pending_approval')) {
@@ -364,6 +330,10 @@ export function banUserStore(targetId: string, reason: string): boolean {
       return a;
     });
     setStorage(STORE_KEYS.ADS, updatedAds);
+
+    if (isSupabaseConfigured) {
+      banUserRPC(targetId, reason);
+    }
     return true;
   }
   return false;
@@ -380,6 +350,10 @@ export function unbanUserStore(targetId: string): boolean {
       bannedAt: undefined
     };
     setStorage(STORE_KEYS.USERS, users);
+
+    if (isSupabaseConfigured) {
+      unbanUserRPC(targetId);
+    }
     return true;
   }
   return false;
@@ -397,6 +371,19 @@ export function updateUserProfile(userId: string, updates: Partial<UserProfile>)
   };
 
   setStorage(STORE_KEYS.USERS, users);
+
+  if (isSupabaseConfigured) {
+    updateOwnProfileInSupabase(userId, {
+      name: updates.name,
+      phone: updates.phone,
+      whatsapp: updates.whatsapp,
+      bio: updates.bio,
+      avatarUrl: updates.avatarUrl,
+      bairro: updates.bairro,
+      city: updates.city
+    });
+  }
+
   return users[index];
 }
 
@@ -418,7 +405,6 @@ export function getAds(options?: {
   let ads = getStorage<Ad[]>(STORE_KEYS.ADS, INITIAL_ADS);
   const users = getAllUsers();
 
-  // Attach user object to ads
   ads = ads.map(ad => ({
     ...ad,
     user: users.find(u => u.id === ad.userId)
@@ -431,7 +417,6 @@ export function getAds(options?: {
     if (options.status && options.status !== 'all') {
       ads = ads.filter(ad => ad.status === options.status);
     } else if (!options.status) {
-      // By default show active ads unless specified
       ads = ads.filter(ad => ad.status === 'active');
     }
     if (options.categoryId) {
@@ -451,7 +436,6 @@ export function getAds(options?: {
     }
     if (options.featuredOnly) {
       let featuredList = ads.filter(ad => ad.isFeatured);
-      // Fallback: If there are fewer than 4 explicitly featured ads, include popular/recent active ads
       if (featuredList.length < 4) {
         const remaining = ads.filter(ad => !ad.isFeatured);
         featuredList = [...featuredList, ...remaining];
@@ -485,55 +469,26 @@ export function getAds(options?: {
       } else if (options.sortBy === 'popular') {
         ads.sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0));
       }
-    } else if (options.featuredOnly) {
-      // Sorting rules for featured ads:
-      // 1. Newest uploads first (creation date within 14 days or recent)
-      // 2. Otherwise ("Caso contrário"), sort by highest viewsCount (most views)
-      const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
-      const now = Date.now();
-
-      ads.sort((a, b) => {
-        // Explicit featured flag priority first
-        if (a.isFeatured !== b.isFeatured) {
-          return a.isFeatured ? -1 : 1;
-        }
-
-        const timeA = new Date(a.createdAt).getTime();
-        const timeB = new Date(b.createdAt).getTime();
-        const ageA = now - timeA;
-        const ageB = now - timeB;
-
-        const isANew = ageA <= FOURTEEN_DAYS_MS;
-        const isBNew = ageB <= FOURTEEN_DAYS_MS;
-
-        // 1. If one is recent and other is not, recent comes first
-        if (isANew && !isBNew) return -1;
-        if (!isANew && isBNew) return 1;
-
-        // 2. If both are recent, sort by newest upload date
-        if (isANew && isBNew) {
-          if (timeB !== timeA) return timeB - timeA;
-          return (b.viewsCount || 0) - (a.viewsCount || 0);
-        }
-
-        // 3. Otherwise ("Caso contrário"), sort by highest views count
-        if ((b.viewsCount || 0) !== (a.viewsCount || 0)) {
-          return (b.viewsCount || 0) - (a.viewsCount || 0);
-        }
-
-        return timeB - timeA;
-      });
     }
   }
 
   return ads;
 }
 
+export async function getAdsAsync(options?: Parameters<typeof getAds>[0]): Promise<Ad[]> {
+  if (isSupabaseConfigured) {
+    const supabaseAds = await getAdsFromSupabase(options);
+    if (supabaseAds && supabaseAds.length > 0) {
+      return supabaseAds;
+    }
+  }
+  return getAds(options);
+}
+
 export function getAdById(id: string): Ad | null {
   const ads = getAds({ status: 'all' });
   const ad = ads.find(a => a.id === id);
   if (ad) {
-    // Increment view count
     incrementAdView(id);
   }
   return ad || null;
@@ -583,7 +538,10 @@ export function createAd(data: Omit<Ad, 'id' | 'createdAt' | 'updatedAt' | 'view
   ads.unshift(newAd);
   setStorage(STORE_KEYS.ADS, ads);
 
-  // Send notification if pending
+  if (isSupabaseConfigured) {
+    createAdInSupabase(data, autoApprove);
+  }
+
   if (!autoApprove && currentUser) {
     addNotification({
       userId: currentUser.id,
@@ -610,28 +568,28 @@ export function updateAd(id: string, updates: Partial<Ad>): Ad | null {
   };
 
   setStorage(STORE_KEYS.ADS, ads);
+
+  if (isSupabaseConfigured) {
+    updateAdInSupabase(id, updates);
+  }
+
   return ads[index];
-}
-
-export function renewAd(id: string): Ad | null {
-  const settings = getSettings();
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + settings.adValidityDays);
-
-  return updateAd(id, {
-    expiresAt: expiresAt.toISOString(),
-    status: 'active'
-  });
 }
 
 export function boostAd(id: string, days: number = 30): Ad | null {
   const featuredUntil = new Date();
   featuredUntil.setDate(featuredUntil.getDate() + days);
 
-  return updateAd(id, {
+  const updated = updateAd(id, {
     isFeatured: true,
     featuredUntil: featuredUntil.toISOString()
   });
+
+  if (isSupabaseConfigured) {
+    boostAdRPC(id, days);
+  }
+
+  return updated;
 }
 
 export function deleteAd(id: string): boolean {
@@ -639,6 +597,11 @@ export function deleteAd(id: string): boolean {
   const initialLength = ads.length;
   ads = ads.filter(a => a.id !== id);
   setStorage(STORE_KEYS.ADS, ads);
+
+  if (isSupabaseConfigured) {
+    deleteAdFromSupabase(id);
+  }
+
   return ads.length < initialLength;
 }
 
@@ -680,10 +643,12 @@ export function sendMessage(data: {
   messages.push(newMsg);
   setStorage(STORE_KEYS.MESSAGES, messages);
 
-  // Increment ad contacts count
   incrementAdContact(data.adId);
 
-  // Send notification to receiver
+  if (isSupabaseConfigured) {
+    sendMessageToSupabase(data);
+  }
+
   addNotification({
     userId: data.receiverId,
     title: `Nova mensagem de ${data.senderName}`,
@@ -713,6 +678,10 @@ export function addReview(reviewData: Omit<Review, 'id' | 'createdAt'>): Review 
   reviews.unshift(newRev);
   setStorage(STORE_KEYS.REVIEWS, reviews);
 
+  if (isSupabaseConfigured) {
+    addReviewToSupabase(reviewData);
+  }
+
   addNotification({
     userId: reviewData.targetUserId,
     title: 'Nova Avaliação Recebida!',
@@ -737,10 +706,11 @@ export function toggleFavorite(userId: string, adId: string): boolean {
   let favs = getStorage<Favorite[]>(STORE_KEYS.FAVORITES, []);
   const existing = favs.find(f => f.userId === userId && f.adId === adId);
 
+  let isFav = false;
   if (existing) {
     favs = favs.filter(f => !(f.userId === userId && f.adId === adId));
     setStorage(STORE_KEYS.FAVORITES, favs);
-    return false; // Removed
+    isFav = false;
   } else {
     favs.push({
       id: `fav_${Date.now()}`,
@@ -749,8 +719,14 @@ export function toggleFavorite(userId: string, adId: string): boolean {
       createdAt: new Date().toISOString()
     });
     setStorage(STORE_KEYS.FAVORITES, favs);
-    return true; // Added
+    isFav = true;
   }
+
+  if (isSupabaseConfigured) {
+    toggleFavoriteInSupabase(userId, adId);
+  }
+
+  return isFav;
 }
 
 export function isFavorite(userId: string, adId: string): boolean {
@@ -770,6 +746,11 @@ export function submitReport(reportData: Omit<Report, 'id' | 'createdAt' | 'stat
 
   reports.unshift(newReport);
   setStorage(STORE_KEYS.REPORTS, reports);
+
+  if (isSupabaseConfigured) {
+    submitReportToSupabase(reportData);
+  }
+
   return newReport;
 }
 
@@ -783,9 +764,78 @@ export function updateReportStatus(id: string, status: 'resolved' | 'dismissed')
   if (index !== -1) {
     reports[index].status = status;
     setStorage(STORE_KEYS.REPORTS, reports);
+
+    if (isSupabaseConfigured) {
+      updateReportStatusInSupabase(id, status);
+    }
     return true;
   }
   return false;
+}
+
+// Notifications
+export function getNotifications(userId: string): Notification[] {
+  const notifs = getStorage<Notification[]>(STORE_KEYS.NOTIFICATIONS, []);
+  return notifs.filter(n => n.userId === userId);
+}
+
+export function addNotification(data: Omit<Notification, 'id' | 'createdAt'>): Notification {
+  const notifs = getStorage<Notification[]>(STORE_KEYS.NOTIFICATIONS, []);
+  const newNotif: Notification = {
+    ...data,
+    id: `notif_${Date.now()}`,
+    createdAt: new Date().toISOString()
+  };
+
+  notifs.unshift(newNotif);
+  setStorage(STORE_KEYS.NOTIFICATIONS, notifs);
+
+  if (isSupabaseConfigured) {
+    addNotificationToSupabase(data);
+  }
+
+  return newNotif;
+}
+
+export function markNotificationRead(id: string): void {
+  const notifs = getStorage<Notification[]>(STORE_KEYS.NOTIFICATIONS, []);
+  const index = notifs.findIndex(n => n.id === id);
+  if (index !== -1) {
+    notifs[index].read = true;
+    setStorage(STORE_KEYS.NOTIFICATIONS, notifs);
+
+    if (isSupabaseConfigured) {
+      markNotificationReadInSupabase(id);
+    }
+  }
+}
+
+// Settings
+export function getSettings(): SystemSettings {
+  return getStorage<SystemSettings>(STORE_KEYS.SETTINGS, INITIAL_SETTINGS);
+}
+
+export function updateSettings(updates: Partial<SystemSettings>): SystemSettings {
+  const settings = getSettings();
+  const updated = { ...settings, ...updates };
+  setStorage(STORE_KEYS.SETTINGS, updated);
+
+  if (isSupabaseConfigured) {
+    updateSettingsInSupabase(updates);
+  }
+
+  return updated;
+}
+
+export function renewAd(id: string): Ad | null {
+  const settings = getSettings();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + settings.adValidityDays);
+
+  return updateAd(id, {
+    expiresAt: expiresAt.toISOString(),
+    status: 'active'
+  });
 }
 
 // Verification Requests
@@ -801,7 +851,6 @@ export function submitVerificationRequest(data: Omit<VerificationRequest, 'id' |
   verifications.unshift(newReq);
   setStorage(STORE_KEYS.VERIFICATIONS, verifications);
 
-  // Update user status to pending
   updateUserProfile(data.userId, { verificationStatus: 'pending' });
 
   return newReq;
@@ -838,10 +887,6 @@ export function resolveVerificationRequest(id: string, approved: boolean, reason
   return false;
 }
 
-export function updateAdStatus(id: string, status: AdStatus): Ad | null {
-  return updateAd(id, { status });
-}
-
 export function updateVerificationStatus(id: string, status: 'approved' | 'rejected', userId?: string): boolean {
   return resolveVerificationRequest(id, status === 'approved');
 }
@@ -850,42 +895,10 @@ export function resolveReport(id: string): boolean {
   return updateReportStatus(id, 'resolved');
 }
 
-// Notifications
-export function getNotifications(userId: string): Notification[] {
-  const notifs = getStorage<Notification[]>(STORE_KEYS.NOTIFICATIONS, []);
-  return notifs.filter(n => n.userId === userId);
-}
-
-export function addNotification(data: Omit<Notification, 'id' | 'createdAt'>): Notification {
-  const notifs = getStorage<Notification[]>(STORE_KEYS.NOTIFICATIONS, []);
-  const newNotif: Notification = {
-    ...data,
-    id: `notif_${Date.now()}`,
-    createdAt: new Date().toISOString()
-  };
-
-  notifs.unshift(newNotif);
-  setStorage(STORE_KEYS.NOTIFICATIONS, notifs);
-  return newNotif;
-}
-
-export function markNotificationRead(id: string): void {
-  const notifs = getStorage<Notification[]>(STORE_KEYS.NOTIFICATIONS, []);
-  const index = notifs.findIndex(n => n.id === id);
-  if (index !== -1) {
-    notifs[index].read = true;
-    setStorage(STORE_KEYS.NOTIFICATIONS, notifs);
+export function updateAdStatus(id: string, status: AdStatus): Ad | null {
+  const updated = updateAd(id, { status });
+  if (isSupabaseConfigured) {
+    reviewAdRPC(id, status === 'active');
   }
-}
-
-// Settings
-export function getSettings(): SystemSettings {
-  return getStorage<SystemSettings>(STORE_KEYS.SETTINGS, INITIAL_SETTINGS);
-}
-
-export function updateSettings(updates: Partial<SystemSettings>): SystemSettings {
-  const settings = getSettings();
-  const updated = { ...settings, ...updates };
-  setStorage(STORE_KEYS.SETTINGS, updated);
   return updated;
 }

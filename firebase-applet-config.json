@@ -1,9 +1,9 @@
 {
-  "projectId": "remixed-project-id",
-  "appId": "remixed-app-id",
-  "apiKey": "remixed-api-key",
-  "authDomain": "remixed-auth-domain",
-  "storageBucket": "remixed-storage-bucket",
-  "messagingSenderId": "remixed-messaging-sender-id",
-  "measurementId": "remixed-measurement-id"
+  "projectId": "mussika-fc4fb",
+  "appId": "1:449460455354:web:c9f3994f1cd7db6ae73f83",
+  "apiKey": "AIzaSyANs3OWKsNmobpaEaLiSyuJ_ltnqMim-TU",
+  "authDomain": "mussika-fc4fb.firebaseapp.com",
+  "storageBucket": "mussika-fc4fb.firebasestorage.app",
+  "messagingSenderId": "449460455354",
+  "measurementId": "G-10QGXZNP3R"
 }

@@ -1,21 +1,22 @@
 -- ==========================================================
 -- QUELIMERCADO / RENT MARKET QUELIMANE - SUPABASE SCHEMA INDEX
 -- ==========================================================
--- O esquema da base de dados Supabase foi modularizado em ficheiros
--- independentes organizados na pasta `/supabase/`.
+-- O esquema da base de dados Supabase está organizado na pasta `/supabase/`:
 --
--- Cada ficheiro tem uma única responsabilidade e não excede 100 linhas:
---
--- 1. `/supabase/00_extensions_and_enums.sql`   (Extensões e Tipos ENUM)
--- 2. `/supabase/01_profiles.sql`               (Tabela Profiles e Trigger Auth)
--- 3. `/supabase/02_categories_and_ads.sql`     (Categorias, Anúncios e Índices)
--- 4. `/supabase/03_interactions.sql`           (Mensagens, Reviews e Favoritos)
--- 5. `/supabase/04_reports_and_verifications.sql` (Denúncias, Pedidos e Audit Log)
--- 6. `/supabase/05_helper_functions.sql`       (Funções Auxiliares: is_admin)
--- 7. `/supabase/06_rls_policies.sql`           (Ativação de RLS e Políticas de Negócio)
--- 8. `/supabase/07_rls_admin_and_system.sql`   (Políticas RLS de Admin e Notificações)
--- 9. `/supabase/08_admin_rpc.sql`              (RPCs: Banir, Desbanir, Verificação)
--- 10. `/supabase/09_storage_buckets.sql`       (Buckets Storage e Políticas RLS)
+-- 1. `/supabase/00_extensions_and_enums.sql`       (Extensões e Tipos ENUM)
+-- 2. `/supabase/01_profiles.sql`                   (Tabela Profiles e Trigger Auth)
+-- 3. `/supabase/02_categories_and_ads.sql`         (Categorias, Anúncios e Índices)
+-- 4. `/supabase/03_interactions.sql`               (Mensagens, Reviews e Favoritos)
+-- 5. `/supabase/04_reports_and_verifications.sql`  (Denúncias, Pedidos e Audit Log)
+-- 6. `/supabase/05_helper_functions.sql`           (Funções Auxiliares: is_admin)
+-- 7. `/supabase/06_rls_policies.sql`               (Ativação de RLS e Políticas de Negócio)
+-- 8. `/supabase/07_rls_admin_and_system.sql`       (Políticas RLS de Admin e Notificações)
+-- 9. `/supabase/08_admin_rpc.sql`                  (RPCs: Banir, Desbanir, Verificação)
+-- 10. `/supabase/09_storage_buckets.sql`           (Buckets Storage e Políticas RLS)
+-- 11. `/supabase/10_profiles_protect_columns.sql`  (Trigger RLS contra auto-promoção)
+-- 12. `/supabase/11_ads_protect_columns.sql`       (Trigger RLS contra auto-aprovação/destaque)
+-- 13. `/supabase/12_payments.sql`                  (Tabela e RLS de Pagamentos M-Pesa/e-Mola/Stripe)
+-- 14. `/supabase/13_system_settings.sql`           (Tabela de Definições e Preços Globais)
 --
 -- Para executar o esquema no SQL Editor do Supabase, execute os scripts
 -- na ordem numérica apresentada acima.

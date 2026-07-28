@@ -28,7 +28,7 @@ export default function PaymentModal({ type, adId, adTitle, onClose, onSuccess }
     ? 'Subscrição Plano Pro Quelimane' 
     : `Impulsionar Anúncio "${adTitle?.substring(0, 30)}..."`;
 
-  const handlePay = (e: React.FormEvent) => {
+  const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
 
@@ -39,24 +39,65 @@ export default function PaymentModal({ type, adId, adTitle, onClose, onSuccess }
 
     setProcessing(true);
 
-    // Simulate mobile money API push / confirmation delay
-    setTimeout(() => {
-      setProcessing(false);
-      setCompleted(true);
+    try {
+      // 1. Initiate payment via server API endpoint
+      const initRes = await fetch('/api/payments/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          type,
+          adId,
+          method: paymentMethod,
+          phoneNumber
+        })
+      });
 
+      const initData = await initRes.json();
+
+      if (!initRes.ok || !initData.success) {
+        throw new Error(initData.error || 'Erro ao iniciar o pagamento.');
+      }
+
+      // 2. Confirm payment on server via webhook endpoint
+      const confirmRes = await fetch('/api/payments/webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentId: initData.paymentId,
+          status: 'confirmed'
+        })
+      });
+
+      const confirmData = await confirmRes.json();
+      if (!confirmRes.ok) {
+        console.warn('Confirmação do servidor com aviso:', confirmData.error);
+      }
+
+      // 3. Update local state store for immediate UI response
       if (type === 'upgrade_plan') {
-        updateUserProfile(currentUser.id, { plan: 'pro', verificationStatus: currentUser.verificationStatus === 'none' ? 'pending' : currentUser.verificationStatus });
+        updateUserProfile(currentUser.id, {
+          plan: 'pro',
+          verificationStatus: currentUser.verificationStatus === 'none' ? 'pending' : currentUser.verificationStatus
+        });
         showToast('Parabéns! O seu plano foi atualizado para Pro Quelimane com sucesso!');
       } else if (type === 'boost_ad' && adId) {
         boostAd(adId, 30);
         showToast('O seu anúncio foi impulsionado para o topo e agora está em Destaque!');
       }
 
+      setProcessing(false);
+      setCompleted(true);
+
       setTimeout(() => {
         onSuccess();
         onClose();
       }, 1500);
-    }, 1800);
+    } catch (err: any) {
+      console.error('Erro no processamento de pagamento:', err);
+      showToast(err.message || 'Erro ao processar pagamento. Tente novamente.', 'error');
+      setProcessing(false);
+    }
   };
 
   return (
