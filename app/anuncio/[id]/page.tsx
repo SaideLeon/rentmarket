@@ -21,7 +21,7 @@ import {
   ShieldCheck,
   Clock
 } from 'lucide-react';
-import { initializeStore, getAdById, getAds, getUserReviews, toggleFavorite, isFavorite, getCurrentUser } from '../../../lib/store';
+import { initializeStore, getAdById, getAdByIdAsync, getAds, getAdsAsync, getUserReviews, getUserReviewsAsync, toggleFavorite, isFavorite, getCurrentUser } from '../../../lib/store';
 import { Ad, Review } from '../../../lib/types';
 import ContactModal from '../../../components/ads/ContactModal';
 import ReviewModal from '../../../components/ads/ReviewModal';
@@ -46,20 +46,22 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
 
-  const loadAd = useCallback(() => {
+  const loadAd = useCallback(async () => {
     initializeStore();
-    const loadedAd = getAdById(resolvedParams.id);
+    const loadedAd = await getAdByIdAsync(resolvedParams.id);
     if (loadedAd) {
       setAd(loadedAd);
       if (currentUserId) {
         setIsFav(isFavorite(currentUserId, loadedAd.id));
       }
       if (loadedAd.userId) {
-        setReviews(getUserReviews(loadedAd.userId));
+        const userRevs = await getUserReviewsAsync(loadedAd.userId);
+        setReviews(userRevs);
       }
 
       // Load related ads
-      const related = getAds({ categoryId: loadedAd.categoryId, status: 'active' })
+      const allCategoryAds = await getAdsAsync({ categoryId: loadedAd.categoryId, status: 'active' });
+      const related = allCategoryAds
         .filter(a => a.id !== loadedAd.id)
         .slice(0, 4);
       setRelatedAds(related);

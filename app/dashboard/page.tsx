@@ -40,8 +40,11 @@ import {
   initializeStore, 
   getCurrentUser, 
   getAds, 
+  getAdsAsync, 
   getMessages, 
+  getMessagesAsync, 
   getFavorites, 
+  getFavoritesAsync, 
   renewAd, 
   deleteAd, 
   updateAd, 
@@ -107,7 +110,7 @@ function DashboardContent() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [boostTargetAd, setBoostTargetAd] = useState<Ad | null>(null);
 
-  const loadDashboard = useCallback(() => {
+  const loadDashboard = useCallback(async () => {
     initializeStore();
     const currentUser = getCurrentUser();
     if (!currentUser) {
@@ -117,11 +120,11 @@ function DashboardContent() {
     setUser(currentUser);
 
     // Load ads
-    const ads = getAds({ userId: currentUser.id, status: 'all' });
+    const ads = await getAdsAsync({ userId: currentUser.id, status: 'all' });
     setMyAds(ads);
 
     // Load messages
-    const msgs = getMessages(currentUser.id);
+    const msgs = await getMessagesAsync(currentUser.id);
     setMessages(msgs);
     if (msgs.length > 0 && !selectedPartnerId) {
       const firstPartner = msgs[0].senderId === currentUser.id ? msgs[0].receiverId : msgs[0].senderId;
@@ -129,7 +132,8 @@ function DashboardContent() {
     }
 
     // Load favorites
-    setFavoriteAds(getFavorites(currentUser.id));
+    const favs = await getFavoritesAsync(currentUser.id);
+    setFavoriteAds(favs);
 
     // Load verifications
     const verifs = getVerificationRequests().filter(v => v.userId === currentUser.id);

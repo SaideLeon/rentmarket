@@ -902,3 +902,82 @@ export function updateAdStatus(id: string, status: AdStatus): Ad | null {
   }
   return updated;
 }
+
+// Async Supabase-first wrappers
+export async function getAdByIdAsync(id: string): Promise<Ad | null> {
+  if (isSupabaseConfigured) {
+    const ads = await getAdsFromSupabase({ status: 'all' });
+    const match = ads.find(a => a.id === id);
+    if (match) {
+      incrementAdView(id);
+      return match;
+    }
+  }
+  return getAdById(id);
+}
+
+export async function createAdAsync(data: Omit<Ad, 'id' | 'createdAt' | 'updatedAt' | 'viewsCount' | 'contactsCount' | 'status' | 'expiresAt' | 'slug'>): Promise<Ad> {
+  const local = createAd(data);
+  if (isSupabaseConfigured) {
+    const created = await createAdInSupabase(data, true);
+    if (created) return created;
+  }
+  return local;
+}
+
+export async function updateAdAsync(id: string, updates: Partial<Ad>): Promise<Ad | null> {
+  const local = updateAd(id, updates);
+  if (isSupabaseConfigured) {
+    const updated = await updateAdInSupabase(id, updates);
+    if (updated) return updated;
+  }
+  return local;
+}
+
+export async function boostAdAsync(id: string, days: number = 30): Promise<Ad | null> {
+  const local = boostAd(id, days);
+  if (isSupabaseConfigured) {
+    await boostAdRPC(id, days);
+  }
+  return local;
+}
+
+export async function getSettingsAsync(): Promise<SystemSettings> {
+  if (isSupabaseConfigured) {
+    const s = await getSettingsFromSupabase();
+    if (s) return s;
+  }
+  return getSettings();
+}
+
+export async function getFavoritesAsync(userId: string): Promise<Ad[]> {
+  if (isSupabaseConfigured) {
+    const favs = await getFavoritesFromSupabase(userId);
+    if (favs && favs.length > 0) return favs;
+  }
+  return getFavorites(userId);
+}
+
+export async function getNotificationsAsync(userId: string): Promise<Notification[]> {
+  if (isSupabaseConfigured) {
+    const notifs = await getNotificationsFromSupabase(userId);
+    if (notifs && notifs.length > 0) return notifs;
+  }
+  return getNotifications(userId);
+}
+
+export async function getMessagesAsync(userId: string): Promise<Message[]> {
+  if (isSupabaseConfigured) {
+    const msgs = await getMessagesFromSupabase(userId);
+    if (msgs && msgs.length > 0) return msgs;
+  }
+  return getMessages(userId);
+}
+
+export async function getUserReviewsAsync(userId: string): Promise<Review[]> {
+  if (isSupabaseConfigured) {
+    const revs = await getUserReviewsFromSupabase(userId);
+    if (revs && revs.length > 0) return revs;
+  }
+  return getUserReviews(userId);
+}

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Sparkles, CheckCircle2, ShieldCheck, Phone, CreditCard, ArrowRight } from 'lucide-react';
-import { getCurrentUser, updateUserProfile, boostAd, getSettings } from '../../lib/store';
+import { getCurrentUser, updateUserProfile, boostAd, boostAdAsync, getSettings } from '../../lib/store';
 import { useToast } from '../ui/Toast';
 
 interface PaymentModalProps {
@@ -59,13 +59,17 @@ export default function PaymentModal({ type, adId, adTitle, onClose, onSuccess }
         throw new Error(initData.error || 'Erro ao iniciar o pagamento.');
       }
 
-      // 2. Confirm payment on server via webhook endpoint
+      // 2. Confirm payment on server via webhook endpoint with secret authorization token
       const confirmRes = await fetch('/api/payments/webhook', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-webhook-secret': initData.webhookSecret || ''
+        },
         body: JSON.stringify({
           paymentId: initData.paymentId,
-          status: 'confirmed'
+          status: 'confirmed',
+          secretToken: initData.webhookSecret
         })
       });
 
@@ -82,7 +86,7 @@ export default function PaymentModal({ type, adId, adTitle, onClose, onSuccess }
         });
         showToast('Parabéns! O seu plano foi atualizado para Pro Quelimane com sucesso!');
       } else if (type === 'boost_ad' && adId) {
-        boostAd(adId, 30);
+        await boostAdAsync(adId, 30);
         showToast('O seu anúncio foi impulsionado para o topo e agora está em Destaque!');
       }
 

@@ -5,14 +5,22 @@
 
 CREATE TABLE IF NOT EXISTS public.system_settings (
   id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  free_plan_max_ads INT DEFAULT 3,
   auto_approve_ads BOOLEAN DEFAULT true,
   ad_validity_days INT DEFAULT 30,
   featured_price_mzn NUMERIC DEFAULT 250,
   pro_plan_price_monthly_mzn NUMERIC DEFAULT 500,
+  mpesa_merchant_number TEXT DEFAULT '841234567',
+  emola_merchant_number TEXT DEFAULT '861234567',
   support_email TEXT DEFAULT 'suporte@quelimercado.mz',
   support_phone TEXT DEFAULT '+258 84 123 4567',
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Garantir adição de colunas se a tabela já existir
+ALTER TABLE public.system_settings ADD COLUMN IF NOT EXISTS free_plan_max_ads INT DEFAULT 3;
+ALTER TABLE public.system_settings ADD COLUMN IF NOT EXISTS mpesa_merchant_number TEXT DEFAULT '841234567';
+ALTER TABLE public.system_settings ADD COLUMN IF NOT EXISTS emola_merchant_number TEXT DEFAULT '861234567';
 
 ALTER TABLE public.system_settings ENABLE ROW LEVEL SECURITY;
 

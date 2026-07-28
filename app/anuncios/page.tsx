@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { LayoutGrid, List, SlidersHorizontal, PlusCircle, SearchX } from 'lucide-react';
-import { initializeStore, getAds, getCategories } from '../../lib/store';
+import { initializeStore, getAds, getAdsAsync, getCategories } from '../../lib/store';
 import { Ad, Category } from '../../lib/types';
 import AdCard from '../../components/ads/AdCard';
 import AdFilterBar from '../../components/ads/AdFilterBar';
@@ -36,31 +36,34 @@ function ListingsContent() {
   const [selectedAdForContact, setSelectedAdForContact] = useState<Ad | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      initializeStore();
-      setCategories(getCategories());
-      setAllAds(getAds({ status: 'active' }));
-    }, 0);
-    return () => clearTimeout(timer);
+    let active = true;
+    initializeStore();
+    Promise.resolve().then(() => {
+      if (active) setCategories(getCategories());
+    });
+    getAdsAsync({ status: 'active' }).then(ads => {
+      if (active) setAllAds(ads);
+    });
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const ads = getAds({
-        searchQuery,
-        categoryId: selectedCategory || undefined,
-        subcategory: selectedSubcategory || undefined,
-        bairro: selectedBairro || undefined,
-        listingType: selectedType === 'ambos' ? undefined : selectedType,
-        minPrice: minPrice ? Number(minPrice) : undefined,
-        maxPrice: maxPrice ? Number(maxPrice) : undefined,
-        sortBy,
-        featuredOnly: isFeatured,
-        status: 'active'
-      });
-      setFilteredAds(ads);
-    }, 0);
-    return () => clearTimeout(timer);
+    let active = true;
+    getAdsAsync({
+      searchQuery,
+      categoryId: selectedCategory || undefined,
+      subcategory: selectedSubcategory || undefined,
+      bairro: selectedBairro || undefined,
+      listingType: selectedType === 'ambos' ? undefined : selectedType,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      sortBy,
+      featuredOnly: isFeatured,
+      status: 'active'
+    }).then(ads => {
+      if (active) setFilteredAds(ads);
+    });
+    return () => { active = false; };
   }, [searchQuery, selectedCategory, selectedSubcategory, selectedBairro, selectedType, minPrice, maxPrice, sortBy, isFeatured]);
 
   const handleResetFilters = () => {

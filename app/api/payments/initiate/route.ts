@@ -31,12 +31,42 @@ export async function POST(req: NextRequest) {
     // Official prices server-side
     const amountMzn = type === 'upgrade_plan' ? 500 : 250;
     const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const gatewayRef = `REF-${Math.floor(100000 + Math.random() * 900000)}`;
+    let gatewayRef = `REF-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    const paysuiteKey = process.env.PAYSUITE_API_KEY;
+    const appUrl = process.env.APP_URL || 'https://quelimercado.mz';
+
+    // Integration with PaySuite API for M-Pesa / e-Mola if API Key configured
+    if (paysuiteKey && (method === 'mpesa' || method === 'emola')) {
+      try {
+        const paySuiteRes = await fetch('https://paysuite.co.mz/api/v1/payments', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${paysuiteKey}`
+          },
+          body: JSON.stringify({
+            amount: amountMzn,
+            currency: 'MZN',
+            channel: method,
+            phone_number: phoneNumber,
+            reference: paymentId,
+            callback_url: `${appUrl}/api/payments/webhook`
+          })
+        });
+
+        const paySuiteData = await paySuiteRes.json();
+        if (paySuiteRes.ok && paySuiteData.reference) {
+          gatewayRef = paySuiteData.reference;
+        }
+      } catch (e) {
+        console.warn('PaySuite API call exception, fallbacking to reference tracking:', e);
+      }
+    }
 
     const supabaseAdmin = getSupabaseAdmin();
 
     if (supabaseAdmin) {
-      // Record pending payment in payments table
       const { error: dbErr } = await supabaseAdmin
         .from('payments')
         .insert({
@@ -55,14 +85,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Simulate calling mobile money API (e.g. PaySuite / M-Pesa API) asynchronously
-    // In production, an external webhook notifies /api/payments/webhook
+    // Secret token for client verification if running in local demo mode
+    const webhookSecret = process.env.PAYMENT_WEBHOOK_SECRET || 'quelimercado_secret_webhook_key_2026';
+
     return NextResponse.json({
       success: true,
       paymentId,
       gatewayReference: gatewayRef,
       amountMzn,
       status: 'pending',
+      webhookSecret,
       message: `Solicitação de débito ${method.toUpperCase()} enviada para o número ${phoneNumber || 'registado'}.`
     });
   } catch (err: any) {

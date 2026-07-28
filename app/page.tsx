@@ -28,7 +28,7 @@ import {
   Mic,
   MicOff
 } from 'lucide-react';
-import { initializeStore, getAds, getCategories } from '../lib/store';
+import { initializeStore, getAds, getAdsAsync, getCategories } from '../lib/store';
 import { Ad, Category } from '../lib/types';
 import AdCard from '../components/ads/AdCard';
 import ContactModal from '../components/ads/ContactModal';
@@ -138,16 +138,19 @@ export default function HomePage() {
     }
   };
 
-  const loadHomeData = useCallback(() => {
+  const loadHomeData = useCallback(async () => {
     initializeStore();
     setCategories(getCategories());
-    setFeaturedAds(getAds({ featuredOnly: true, status: 'active' }));
     
-    setRecentAds(getAds({
+    const feat = await getAdsAsync({ featuredOnly: true, status: 'active' });
+    setFeaturedAds(feat);
+
+    const rec = await getAdsAsync({
       listingType: activeTab === 'todos' ? undefined : activeTab,
       status: 'active',
       sortBy: 'recent'
-    }).slice(0, 8));
+    });
+    setRecentAds(rec.slice(0, 8));
   }, [activeTab]);
 
   useEffect(() => {

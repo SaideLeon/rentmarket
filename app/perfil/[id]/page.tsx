@@ -12,7 +12,7 @@ import {
   ShieldCheck, 
   Store 
 } from 'lucide-react';
-import { initializeStore, getAllUsers, getAds, getUserReviews } from '../../../lib/store';
+import { initializeStore, getAllUsers, getAds, getAdsAsync, getUserReviews, getUserReviewsAsync } from '../../../lib/store';
 import { UserProfile, Ad, Review } from '../../../lib/types';
 import AdCard from '../../../components/ads/AdCard';
 import ReviewModal from '../../../components/ads/ReviewModal';
@@ -28,14 +28,16 @@ export default function PublicProfilePage({ params }: { params: Promise<{ id: st
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedAdForContact, setSelectedAdForContact] = useState<Ad | null>(null);
 
-  const loadProfile = useCallback(() => {
+  const loadProfile = useCallback(async () => {
     initializeStore();
     const allUsers = getAllUsers();
     const found = allUsers.find(u => u.id === resolvedParams.id);
     if (found) {
       setProfileUser(found);
-      setUserAds(getAds({ userId: found.id, status: 'active' }));
-      setReviews(getUserReviews(found.id));
+      const ads = await getAdsAsync({ userId: found.id, status: 'active' });
+      setUserAds(ads);
+      const revs = await getUserReviewsAsync(found.id);
+      setReviews(revs);
     }
   }, [resolvedParams.id]);
 

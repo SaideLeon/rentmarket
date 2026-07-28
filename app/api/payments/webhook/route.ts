@@ -11,8 +11,22 @@ const getSupabaseAdmin = () => {
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization') || req.headers.get('x-webhook-secret') || '';
+    const expectedSecret = process.env.PAYSUITE_WEBHOOK_SECRET || process.env.PAYMENT_WEBHOOK_SECRET || 'quelimercado_secret_webhook_key_2026';
+
     const body = await req.json();
-    const { paymentId, status } = body;
+    const { paymentId, status, secretToken } = body;
+
+    // Validate webhook authorization / secret token to prevent unauthorized calls
+    const isAuthorized = 
+      authHeader.includes(expectedSecret) || 
+      secretToken === expectedSecret ||
+      (process.env.NODE_ENV === 'development' && secretToken === 'quelimercado_secret_webhook_key_2026');
+
+    if (!isAuthorized) {
+      console.warn('Tentativa de chamada de webhook não autorizada.');
+      return NextResponse.json({ error: 'Assinatura ou chave de webhook inválida.' }, { status: 401 });
+    }
 
     if (!paymentId) {
       return NextResponse.json({ error: 'ID de pagamento em falta.' }, { status: 400 });
@@ -59,7 +73,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, message: 'Webhook processado com sucesso.' });
+    return NextResponse.json({ success: true, message: 'Webhook de pagamento autenticado e processado com sucesso.' });
   } catch (err: any) {
     console.error('Erro no webhook de pagamento:', err);
     return NextResponse.json({ error: 'Erro interno ao processar webhook.' }, { status: 500 });

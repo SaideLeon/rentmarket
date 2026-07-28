@@ -14,7 +14,7 @@ import {
   X,
   AlertCircle
 } from 'lucide-react';
-import { initializeStore, getCategories, createAd, getCurrentUser } from '../../lib/store';
+import { initializeStore, getCategories, createAd, createAdAsync, getCurrentUser } from '../../lib/store';
 import { Category, ListingType, UserProfile } from '../../lib/types';
 import { QUELIMANE_BAIRROS } from '../../lib/data/initialData';
 import { useToast } from '../../components/ui/Toast';
@@ -137,8 +137,8 @@ export default function AnunciarPage() {
     const numericPrice = priceType === 'negotiable' ? null : (parseFloat(priceInput) || 0);
     const selectedCatObj = categories.find(c => c.id === categoryId);
 
-    setTimeout(() => {
-      const newAd = createAd({
+    setTimeout(async () => {
+      const newAd = await createAdAsync({
         userId: user.id,
         title: title.trim(),
         description: description.trim(),
