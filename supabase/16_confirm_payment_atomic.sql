@@ -59,4 +59,4 @@ $$;
 -- Permissões
 REVOKE EXECUTE ON FUNCTION public.confirm_payment(TEXT, UUID, TEXT) FROM PUBLIC;
 REVOKE EXECUTE ON FUNCTION public.confirm_payment(TEXT, UUID, TEXT) FROM anon;
-GRANT EXECUTE ON FUNCTION public.confirm_payment(TEXT, UUID, TEXT) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.confirm_payment(TEXT, UUID, TEXT) FROM authenticated;

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { createPaySuitePaymentRequest, generatePaymentReference, PaySuiteMethod } from '@/lib/paysuite';
 
 function getServiceSupabase() {
@@ -7,6 +9,39 @@ function getServiceSupabase() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
   if (!supabaseUrl || !serviceKey) return null;
   return createClient(supabaseUrl, serviceKey);
+}
+
+async function getAuthenticatedUser(req: NextRequest) {
+  try {
+    const cookieStore = await cookies();
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+    if (supabaseUrl && anonKey) {
+      const supabase = createServerClient(supabaseUrl, anonKey, {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) return user;
+    }
+
+    const authHeader = req.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const serviceClient = getServiceSupabase();
+      if (serviceClient) {
+        const { data: { user } } = await serviceClient.auth.getUser(token);
+        if (user) return user;
+      }
+    }
+  } catch (err) {
+    console.warn('Aviso ao verificar sessão de utilizador:', err);
+  }
+  return null;
 }
 
 const PRICES: Record<string, number> = {
@@ -17,11 +52,21 @@ const PRICES: Record<string, number> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userId, type, adId, method, phoneNumber } = body;
+    const { userId: bodyUserId, type, adId, method, phoneNumber } = body;
 
-    if (!userId || !type || !method) {
+    const authenticatedUser = await getAuthenticatedUser(req);
+    const userId = authenticatedUser?.id || bodyUserId;
+
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Parâmetros inválidos. É necessário userId, type e method.' },
+        { error: 'Não autenticado ou ID de utilizador em falta.' },
+        { status: 401 }
+      );
+    }
+
+    if (!type || !method) {
+      return NextResponse.json(
+        { error: 'Parâmetros inválidos. É necessário type e method.' },
         { status: 400 }
       );
     }

@@ -33,6 +33,7 @@ export async function createPaySuitePaymentRequest(input: {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       amount: input.amountMzn.toFixed(2),
@@ -59,11 +60,54 @@ export async function createPaySuitePaymentRequest(input: {
   };
 }
 
+export async function getPaySuitePaymentStatus(id: string) {
+  const token = getApiToken();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${PAYSUITE_BASE_URL}/payments/${id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    });
+
+    const json = await res.json().catch(() => null);
+    if (!res.ok || !json?.data) return null;
+
+    return {
+      id: String(json.data.id),
+      reference: String(json.data.reference ?? ''),
+      status: String(json.data.status ?? 'pending'),
+      transactionStatus: json.data.transaction_status ? String(json.data.transaction_status) : null,
+    };
+  } catch (err) {
+    console.warn('Erro ao consultar PaySuite status:', err);
+    return null;
+  }
+}
+
+export function isPaySuitePaidStatus(
+  status: string | null | undefined,
+  transactionStatus: string | null | undefined
+): boolean {
+  const normStatus = (status ?? '').toLowerCase();
+  const normTxStatus = (transactionStatus ?? '').toLowerCase();
+  return (
+    normStatus === 'paid' ||
+    normStatus === 'success' ||
+    normStatus === 'confirmed' ||
+    normTxStatus === 'completed' ||
+    normTxStatus === 'paid'
+  );
+}
+
 export function verifyPaySuiteWebhookSignature(payload: string, signature: string | null): boolean {
   const secret = process.env.PAYSUITE_WEBHOOK_SECRET?.trim() || process.env.PAYMENT_WEBHOOK_SECRET?.trim();
   if (!secret) return false;
 
-  // In development mode without signature provided, allow authorization if secret matches custom header
   if (!signature) {
     return false;
   }
