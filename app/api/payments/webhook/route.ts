@@ -1,81 +1,88 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { verifyPaySuiteWebhookSignature } from '@/lib/paysuite';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-const getSupabaseAdmin = () => {
-  if (!supabaseUrl || !supabaseServiceKey) return null;
-  return createClient(supabaseUrl, supabaseServiceKey);
-};
+function getServiceSupabase() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  if (!supabaseUrl || !serviceKey) return null;
+  return createClient(supabaseUrl, serviceKey);
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization') || req.headers.get('x-webhook-secret') || '';
-    const expectedSecret = process.env.PAYSUITE_WEBHOOK_SECRET || process.env.PAYMENT_WEBHOOK_SECRET || 'quelimercado_secret_webhook_key_2026';
+    const rawPayload = await req.text();
+    const signature = req.headers.get('x-webhook-signature') || req.headers.get('x-paysuite-signature') || '';
+    const secretHeader = req.headers.get('x-webhook-secret') || req.headers.get('authorization') || '';
+    const expectedSecret = process.env.PAYSUITE_WEBHOOK_SECRET?.trim() || process.env.PAYMENT_WEBHOOK_SECRET?.trim();
 
-    const body = await req.json();
-    const { paymentId, status, secretToken } = body;
+    let isAuthorized = false;
 
-    // Validate webhook authorization / secret token to prevent unauthorized calls
-    const isAuthorized = 
-      authHeader.includes(expectedSecret) || 
-      secretToken === expectedSecret ||
-      (process.env.NODE_ENV === 'development' && secretToken === 'quelimercado_secret_webhook_key_2026');
+    if (signature) {
+      isAuthorized = verifyPaySuiteWebhookSignature(rawPayload, signature);
+    } else if (expectedSecret && secretHeader.includes(expectedSecret)) {
+      isAuthorized = true;
+    }
 
     if (!isAuthorized) {
       console.warn('Tentativa de chamada de webhook não autorizada.');
-      return NextResponse.json({ error: 'Assinatura ou chave de webhook inválida.' }, { status: 401 });
+      return NextResponse.json({ error: 'Assinatura ou autenticação de webhook inválida.' }, { status: 401 });
     }
 
-    if (!paymentId) {
-      return NextResponse.json({ error: 'ID de pagamento em falta.' }, { status: 400 });
+    const body = JSON.parse(rawPayload);
+    const reference = body?.data?.reference || body?.gatewayReference || body?.reference;
+    const paymentId = body?.paymentId || body?.id;
+    const status = body?.event === 'payment.success' || body?.status === 'confirmed' || body?.status === 'success' ? 'confirmed' : 'failed';
+
+    const supabase = getServiceSupabase();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Configuração do banco de dados incompleta.' }, { status: 500 });
     }
 
-    const supabaseAdmin = getSupabaseAdmin();
-
-    if (supabaseAdmin) {
-      // 1. Fetch payment details
-      const { data: payment, error: fetchErr } = await supabaseAdmin
+    // Lookup payment by ID or gateway reference
+    let targetPaymentId = paymentId;
+    if (!targetPaymentId && reference) {
+      const { data: found } = await supabase
         .from('payments')
-        .select('*')
-        .eq('id', paymentId)
-        .single();
+        .select('id')
+        .eq('gateway_reference', reference)
+        .maybeSingle();
+      if (found) targetPaymentId = found.id;
+    }
 
-      if (fetchErr || !payment) {
-        return NextResponse.json({ error: 'Pagamento não encontrado.' }, { status: 404 });
-      }
+    if (!targetPaymentId) {
+      return NextResponse.json({ error: 'Pagamento não encontrado.' }, { status: 404 });
+    }
 
-      const finalStatus = status === 'failed' ? 'failed' : 'confirmed';
+    if (status === 'confirmed') {
+      // Call atomic confirm_payment RPC
+      const { data: rpcRes, error: rpcErr } = await supabase.rpc('confirm_payment', {
+        p_payment_id: targetPaymentId,
+        p_confirmed_by: null,
+        p_source: 'webhook',
+      });
 
-      // 2. Update status
-      await supabaseAdmin
-        .from('payments')
-        .update({
-          status: finalStatus,
-          confirmed_at: new Date().toISOString()
-        })
-        .eq('id', paymentId);
-
-      // 3. If confirmed, trigger server RPCs to grant features
-      if (finalStatus === 'confirmed') {
-        if (payment.type === 'upgrade_plan' && payment.user_id) {
-          await supabaseAdmin.rpc('upgrade_plan_paid', {
-            target_id: payment.user_id,
-            new_plan: 'pro'
-          });
-        } else if (payment.type === 'boost_ad' && payment.ad_id) {
-          await supabaseAdmin.rpc('boost_ad_paid', {
-            target_id: payment.ad_id,
-            days: 30
-          });
+      if (rpcErr) {
+        console.error('Erro na RPC confirm_payment:', rpcErr);
+        // Fallback to table update + manual update if RPC fails
+        const { data: pData } = await supabase.from('payments').select('*').eq('id', targetPaymentId).single();
+        if (pData) {
+          await supabase.from('payments').update({ status: 'confirmed', confirmed_at: new Date().toISOString() }).eq('id', targetPaymentId);
+          if (pData.type === 'upgrade_plan') {
+            await supabase.from('profiles').update({ plan: 'pro' }).eq('id', pData.user_id);
+          } else if (pData.type === 'boost_ad' && pData.ad_id) {
+            await supabase.from('ads').update({ is_featured: true, featured_until: new Date(Date.now() + 30*24*60*60*1000).toISOString() }).eq('id', pData.ad_id);
+          }
         }
       }
+    } else {
+      await supabase.from('payments').update({ status: 'failed' }).eq('id', targetPaymentId);
     }
 
-    return NextResponse.json({ success: true, message: 'Webhook de pagamento autenticado e processado com sucesso.' });
+    return NextResponse.json({ ok: true, success: true, message: 'Webhook processado com sucesso.' });
   } catch (err: any) {
     console.error('Erro no webhook de pagamento:', err);
     return NextResponse.json({ error: 'Erro interno ao processar webhook.' }, { status: 500 });
   }
 }
+

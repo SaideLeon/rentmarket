@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createPaySuitePaymentRequest, generatePaymentReference, PaySuiteMethod } from '@/lib/paysuite';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+function getServiceSupabase() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  if (!supabaseUrl || !serviceKey) return null;
+  return createClient(supabaseUrl, serviceKey);
+}
 
-const getSupabaseAdmin = () => {
-  if (!supabaseUrl || !supabaseServiceKey) return null;
-  return createClient(supabaseUrl, supabaseServiceKey);
+const PRICES: Record<string, number> = {
+  upgrade_plan: 500,
+  boost_ad: 250,
 };
 
 export async function POST(req: NextRequest) {
@@ -21,55 +26,55 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if ((method === 'mpesa' || method === 'emola') && !phoneNumber) {
+    if (!['upgrade_plan', 'boost_ad'].includes(type) || !['mpesa', 'emola', 'credit_card', 'stripe'].includes(method)) {
+      return NextResponse.json({ error: 'Tipo ou método de pagamento não suportado.' }, { status: 400 });
+    }
+
+    if ((method === 'mpesa' || method === 'emola') && !phoneNumber?.trim()) {
       return NextResponse.json(
-        { error: 'Número de telemóvel necessário para pagamentos M-Pesa/e-Mola.' },
+        { error: 'Número de telemóvel necessário para pagamentos M-Pesa / e-Mola.' },
         { status: 400 }
       );
     }
 
-    // Official prices server-side
-    const amountMzn = type === 'upgrade_plan' ? 500 : 250;
-    const paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    let gatewayRef = `REF-${Math.floor(100000 + Math.random() * 900000)}`;
+    const amountMzn = PRICES[type] || 250;
+    const reference = generatePaymentReference(type, userId);
+    const appUrl = process.env.APP_URL?.trim() || new URL(req.url).origin;
 
-    const paysuiteKey = process.env.PAYSUITE_API_KEY;
-    const appUrl = process.env.APP_URL || 'https://quelimercado.mz';
-
-    // Integration with PaySuite API for M-Pesa / e-Mola if API Key configured
-    if (paysuiteKey && (method === 'mpesa' || method === 'emola')) {
-      try {
-        const paySuiteRes = await fetch('https://paysuite.co.mz/api/v1/payments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${paysuiteKey}`
-          },
-          body: JSON.stringify({
-            amount: amountMzn,
-            currency: 'MZN',
-            channel: method,
-            phone_number: phoneNumber,
-            reference: paymentId,
-            callback_url: `${appUrl}/api/payments/webhook`
-          })
-        });
-
-        const paySuiteData = await paySuiteRes.json();
-        if (paySuiteRes.ok && paySuiteData.reference) {
-          gatewayRef = paySuiteData.reference;
-        }
-      } catch (e) {
-        console.warn('PaySuite API call exception, fallbacking to reference tracking:', e);
-      }
+    let paySuitePayment = null;
+    try {
+      paySuitePayment = await createPaySuitePaymentRequest({
+        amountMzn,
+        reference,
+        description: `QueliMercado - ${type === 'upgrade_plan' ? 'Plano Pro' : 'Anúncio em Destaque'}`,
+        method: method as PaySuiteMethod,
+        phoneNumber,
+        callbackUrl: `${appUrl}/api/payments/webhook`,
+      });
+    } catch (paySuiteErr: any) {
+      console.warn('PaySuite payment creation note:', paySuiteErr?.message || paySuiteErr);
     }
 
-    const supabaseAdmin = getSupabaseAdmin();
+    const gatewayRef = paySuitePayment?.reference || reference;
+    const supabase = getServiceSupabase();
+    let paymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    if (supabaseAdmin) {
-      const { error: dbErr } = await supabaseAdmin
-        .from('payments')
-        .insert({
+    if (supabase) {
+      // Try using register_payment RPC or direct service role insert
+      const { data: rpcData, error: rpcErr } = await supabase.rpc('register_payment', {
+        p_user_id: userId,
+        p_type: type,
+        p_ad_id: adId || null,
+        p_method: method,
+        p_amount_mzn: amountMzn,
+        p_gateway_reference: gatewayRef,
+      });
+
+      if (!rpcErr && rpcData?.payment_id) {
+        paymentId = rpcData.payment_id;
+      } else {
+        // Fallback to table insert if RPC not present in current DB state
+        const { error: dbErr } = await supabase.from('payments').insert({
           id: paymentId,
           user_id: userId,
           ad_id: adId || null,
@@ -77,31 +82,31 @@ export async function POST(req: NextRequest) {
           method,
           amount_mzn: amountMzn,
           status: 'pending',
-          gateway_reference: gatewayRef
+          gateway_reference: gatewayRef,
         });
 
-      if (dbErr) {
-        console.warn('Erro ao registar pagamento no Supabase:', dbErr.message);
+        if (dbErr) {
+          console.warn('Erro ao registar pagamento no Supabase:', dbErr.message);
+        }
       }
     }
 
-    // Secret token for client verification if running in local demo mode
-    const webhookSecret = process.env.PAYMENT_WEBHOOK_SECRET || 'quelimercado_secret_webhook_key_2026';
-
+    // Secure response: NEVER return secrets or client auto-confirm parameters
     return NextResponse.json({
       success: true,
       paymentId,
       gatewayReference: gatewayRef,
       amountMzn,
       status: 'pending',
-      webhookSecret,
-      message: `Solicitação de débito ${method.toUpperCase()} enviada para o número ${phoneNumber || 'registado'}.`
+      checkoutUrl: paySuitePayment?.checkoutUrl || null,
+      message: `Solicitação de pagamento (${method.toUpperCase()}) enviada. Por favor confirme no seu dispositivo.`,
     });
   } catch (err: any) {
     console.error('Erro ao iniciar pagamento:', err);
     return NextResponse.json(
-      { error: 'Erro interno ao processar o pagamento.' },
+      { error: 'Erro interno ao processar a solicitação de pagamento.' },
       { status: 500 }
     );
   }
 }
+

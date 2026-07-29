@@ -59,44 +59,50 @@ export default function PaymentModal({ type, adId, adTitle, onClose, onSuccess }
         throw new Error(initData.error || 'Erro ao iniciar o pagamento.');
       }
 
-      // 2. Confirm payment on server via webhook endpoint with secret authorization token
-      const confirmRes = await fetch('/api/payments/webhook', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-webhook-secret': initData.webhookSecret || ''
-        },
-        body: JSON.stringify({
-          paymentId: initData.paymentId,
-          status: 'confirmed',
-          secretToken: initData.webhookSecret
-        })
-      });
+      showToast(initData.message || 'Solicitação de pagamento iniciada. Por favor confirme no seu telemóvel.');
 
-      const confirmData = await confirmRes.json();
-      if (!confirmRes.ok) {
-        console.warn('Confirmação do servidor com aviso:', confirmData.error);
+      // If redirect URL provided (e.g. credit card / Stripe / PaySuite checkout), open in new window
+      if (initData.checkoutUrl) {
+        window.open(initData.checkoutUrl, '_blank');
       }
 
-      // 3. Update local state store for immediate UI response
-      if (type === 'upgrade_plan') {
-        updateUserProfile(currentUser.id, {
-          plan: 'pro',
-          verificationStatus: currentUser.verificationStatus === 'none' ? 'pending' : currentUser.verificationStatus
-        });
-        showToast('Parabéns! O seu plano foi atualizado para Pro Quelimane com sucesso!');
-      } else if (type === 'boost_ad' && adId) {
-        await boostAdAsync(adId, 30);
-        showToast('O seu anúncio foi impulsionado para o topo e agora está em Destaque!');
+      // 2. Poll server for payment confirmation (server-authoritative)
+      const paymentId = initData.paymentId;
+      let isConfirmed = false;
+      const maxAttempts = 30; // ~1.5 - 2 minutes polling
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        await new Promise(r => setTimeout(r, 3000));
+        
+        const statusRes = await fetch(`/api/payments/status?id=${paymentId}`);
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.status === 'confirmed') {
+            isConfirmed = true;
+            break;
+          }
+          if (statusData.status === 'failed') {
+            throw new Error('O pagamento foi recusado ou cancelado.');
+          }
+        }
       }
 
-      setProcessing(false);
-      setCompleted(true);
+      if (isConfirmed) {
+        showToast(
+          type === 'upgrade_plan' 
+            ? 'Parabéns! O seu plano foi atualizado para Pro Quelimane com sucesso!'
+            : 'O seu anúncio foi impulsionado para o topo e agora está em Destaque!'
+        );
+        setProcessing(false);
+        setCompleted(true);
 
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 1500);
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 1500);
+      } else {
+        throw new Error('Aguardando confirmação do pagamento. Verifique o seu telemóvel ou tente novamente.');
+      }
     } catch (err: any) {
       console.error('Erro no processamento de pagamento:', err);
       showToast(err.message || 'Erro ao processar pagamento. Tente novamente.', 'error');
