@@ -21,7 +21,7 @@ import {
   ShieldCheck,
   Clock
 } from 'lucide-react';
-import { initializeStore, getAdById, getAdByIdAsync, getAds, getAdsAsync, getUserReviews, getUserReviewsAsync, toggleFavorite, isFavorite, getCurrentUser } from '../../../lib/store';
+import { initializeStore, getAdById, getAdByIdAsync, getAds, getAdsAsync, getUserReviews, getUserReviewsAsync, toggleFavoriteAsync, isFavoriteAsync, getCurrentUser } from '../../../lib/store';
 import { Ad, Review } from '../../../lib/types';
 import ContactModal from '../../../components/ads/ContactModal';
 import ReviewModal from '../../../components/ads/ReviewModal';
@@ -52,7 +52,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
     if (loadedAd) {
       setAd(loadedAd);
       if (currentUserId) {
-        setIsFav(isFavorite(currentUserId, loadedAd.id));
+        isFavoriteAsync(currentUserId, loadedAd.id).then(setIsFav);
       }
       if (loadedAd.userId) {
         const userRevs = await getUserReviewsAsync(loadedAd.userId);
@@ -98,12 +98,12 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
     if (!currentUser) {
       showToast('Inicie sessão para guardar nos favoritos.', 'info');
       return;
     }
-    const updated = toggleFavorite(currentUser.id, ad.id);
+    const updated = await toggleFavoriteAsync(currentUser.id, ad.id);
     setIsFav(updated);
     showToast(updated ? 'Guardado nos favoritos!' : 'Removido dos favoritos.');
   };

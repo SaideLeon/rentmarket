@@ -45,11 +45,11 @@ import {
   getMessagesAsync, 
   getFavorites, 
   getFavoritesAsync, 
-  renewAd, 
-  deleteAd, 
-  updateAd, 
-  sendMessage, 
-  updateUserProfile, 
+  renewAdAsync, 
+  deleteAdAsync, 
+  updateAdAsync, 
+  sendMessageAsync, 
+  updateUserProfileAsync, 
   submitVerificationRequest,
   getVerificationRequests,
   getSettings
@@ -163,28 +163,28 @@ function DashboardContent() {
   const totalViews = myAds.reduce((sum, a) => sum + a.viewsCount, 0);
   const totalContacts = myAds.reduce((sum, a) => sum + a.contactsCount, 0);
 
-  const handleRenewAd = (id: string) => {
-    renewAd(id);
+  const handleRenewAd = async (id: string) => {
+    await renewAdAsync(id);
     showToast('Anúncio renovado por mais 30 dias!');
-    loadDashboard();
+    await loadDashboard();
   };
 
-  const handleTogglePause = (ad: Ad) => {
+  const handleTogglePause = async (ad: Ad) => {
     const newStatus = ad.status === 'active' ? 'paused' : 'active';
     setRecentlyToggledId(ad.id);
-    updateAd(ad.id, { status: newStatus });
+    await updateAdAsync(ad.id, { status: newStatus });
     showToast(newStatus === 'paused' ? 'Anúncio pausado com sucesso.' : 'Anúncio reativado e visível!');
-    loadDashboard();
+    await loadDashboard();
     setTimeout(() => {
       setRecentlyToggledId(null);
     }, 1500);
   };
 
-  const handleDeleteAd = (id: string) => {
+  const handleDeleteAd = async (id: string) => {
     if (window.confirm('Tem certeza que deseja apagar este anúncio?')) {
-      deleteAd(id);
+      await deleteAdAsync(id);
       showToast('Anúncio apagado.');
-      loadDashboard();
+      await loadDashboard();
     }
   };
 
@@ -199,7 +199,7 @@ function DashboardContent() {
     const adTitle = lastMsg?.adTitle || 'Contacto no Rent Market';
     const adId = lastMsg?.adId || 'ad_1';
 
-    sendMessage({
+    await sendMessageAsync({
       adId,
       adTitle,
       senderId: user.id,
@@ -360,9 +360,9 @@ function DashboardContent() {
     loadDashboard();
   };
 
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateUserProfile(user.id, {
+    await updateUserProfileAsync(user.id, {
       name: name.trim(),
       phone: phone.trim(),
       whatsapp: whatsapp.trim(),
@@ -371,7 +371,7 @@ function DashboardContent() {
     });
 
     showToast('Dados de perfil guardados com sucesso!');
-    loadDashboard();
+    await loadDashboard();
   };
 
   // Group messages by partner user

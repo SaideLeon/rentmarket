@@ -23,7 +23,7 @@ import {
   Store,
   Mail
 } from 'lucide-react';
-import { getCurrentUser, getAllUsers, setCurrentUser, logoutUser, getNotifications, getMessages } from '../../lib/store';
+import { getCurrentUser, getAllUsers, setCurrentUser, logoutUser, getNotificationsAsync, getMessagesAsync } from '../../lib/store';
 import { UserProfile } from '../../lib/types';
 import GmailModal from '../gmail/GmailModal';
 
@@ -42,16 +42,16 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showGmailModal, setShowGmailModal] = useState(false);
 
-  const loadUserData = useCallback(() => {
+  const loadUserData = useCallback(async () => {
     const currentUser = getCurrentUser();
     setUser(currentUser);
     setAllUsers(getAllUsers());
 
     if (currentUser) {
-      const notifs = getNotifications(currentUser.id);
+      const notifs = await getNotificationsAsync(currentUser.id);
       setUnreadNotifsCount(notifs.filter(n => !n.read).length);
 
-      const msgs = getMessages(currentUser.id);
+      const msgs = await getMessagesAsync(currentUser.id);
       setUnreadMsgsCount(msgs.filter(m => m.receiverId === currentUser.id && !m.read).length);
     }
   }, []);

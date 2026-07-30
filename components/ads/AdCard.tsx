@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { 
   MapPin, 
@@ -13,8 +13,8 @@ import {
   Eye,
   Clock
 } from 'lucide-react';
-import { Ad } from '../../lib/types';
-import { getCurrentUser, toggleFavorite, isFavorite, getUserReviews } from '../../lib/store';
+import { Ad, Review } from '../../lib/types';
+import { getCurrentUser, toggleFavoriteAsync, isFavoriteAsync, getUserReviewsAsync } from '../../lib/store';
 import { useToast } from '../ui/Toast';
 
 interface AdCardProps {
@@ -25,24 +25,34 @@ interface AdCardProps {
 export default function AdCard({ ad, onContactClick }: AdCardProps) {
   const { showToast } = useToast();
   const currentUser = getCurrentUser();
-  const [favorite, setFavorite] = useState(() => 
-    currentUser ? isFavorite(currentUser.id, ad.id) : false
-  );
+  const [favorite, setFavorite] = useState(false);
   const [now] = useState(() => Date.now());
 
-  const reviews = ad.userId ? getUserReviews(ad.userId) : [];
+  useEffect(() => {
+    if (currentUser) {
+      isFavoriteAsync(currentUser.id, ad.id).then(setFavorite);
+    }
+  }, [currentUser, ad.id]);
+
+  const [reviews, setReviews] = useState<Review[]>([]);
+  useEffect(() => {
+    if (ad.userId) {
+      getUserReviewsAsync(ad.userId).then(setReviews);
+    }
+  }, [ad.userId]);
+
   const avgRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!currentUser) {
       showToast('Inicie sessão para guardar nos favoritos.', 'info');
       return;
     }
-    const isNowFav = toggleFavorite(currentUser.id, ad.id);
+    const isNowFav = await toggleFavoriteAsync(currentUser.id, ad.id);
     setFavorite(isNowFav);
     showToast(isNowFav ? 'Anúncio guardado nos favoritos!' : 'Removido dos favoritos.');
   };

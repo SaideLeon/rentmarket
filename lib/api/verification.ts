@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import type { VerificationRequest } from '../types';
 
 export async function uploadPrivateDocument(file: File, userId: string): Promise<{ path: string; error?: string }> {
@@ -90,7 +90,7 @@ export async function createVerificationRequestSupabase(params: {
   documentNumber: string;
   documentImagePath: string;
 }): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(params.userId)) return false;
 
   try {
     const { error } = await supabase.from('verification_requests').insert({
@@ -170,7 +170,7 @@ export async function reviewVerificationRPC(
   approve: boolean,
   reason?: string
 ): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(requestId)) return false;
   try {
     const { error } = await supabase.rpc('admin_review_verification', {
       request_id: requestId,

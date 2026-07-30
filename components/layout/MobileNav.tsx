@@ -4,17 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Search, PlusCircle, MessageSquare, User } from 'lucide-react';
-import { getCurrentUser, getMessages } from '../../lib/store';
+import { getCurrentUser, getMessagesAsync } from '../../lib/store';
 
 export default function MobileNav() {
   const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       const user = getCurrentUser();
       if (user) {
-        const msgs = getMessages(user.id);
+        const msgs = await getMessagesAsync(user.id);
         const count = msgs.filter(m => m.receiverId === user.id && !m.read).length;
         setUnreadCount(count);
       }

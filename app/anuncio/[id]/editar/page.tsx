@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, Trash2, PauseCircle, PlayCircle } from 'lucide-react';
-import { initializeStore, getAdById, updateAd, deleteAd, getCurrentUser } from '../../../../lib/store';
+import { initializeStore, getAdById, getAdByIdAsync, updateAdAsync, deleteAdAsync, getCurrentUser } from '../../../../lib/store';
 import { Ad } from '../../../../lib/types';
 import { QUELIMANE_BAIRROS } from '../../../../lib/data/initialData';
 import { useToast } from '../../../../components/ui/Toast';
@@ -31,9 +31,9 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       initializeStore();
-      const loadedAd = getAdById(resolvedParams.id);
+      const loadedAd = await getAdByIdAsync(resolvedParams.id);
       if (loadedAd) {
         if (currentUserId && currentUserId !== loadedAd.userId && currentUserRole !== 'admin') {
           showToast('Não tem permissão para editar este anúncio.', 'error');
@@ -67,7 +67,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
@@ -75,27 +75,25 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
     const finalImages = images.length > 0 ? images : ['https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&q=80&w=800'];
     const finalCover = finalImages[coverIndex] || finalImages[0];
 
-    setTimeout(() => {
-      updateAd(ad.id, {
-        title: title.trim(),
-        description: description.trim(),
-        price: numericPrice,
-        priceType,
-        bairro,
-        status,
-        images: finalImages,
-        coverImage: finalCover
-      });
+    await updateAdAsync(ad.id, {
+      title: title.trim(),
+      description: description.trim(),
+      price: numericPrice,
+      priceType,
+      bairro,
+      status,
+      images: finalImages,
+      coverImage: finalCover
+    });
 
-      setSaving(false);
-      showToast('Anúncio atualizado com sucesso!');
-      router.push(`/anuncio/${ad.id}`);
-    }, 400);
+    setSaving(false);
+    showToast('Anúncio atualizado com sucesso!');
+    router.push(`/anuncio/${ad.id}`);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm('Tem certeza que deseja apagar este anúncio permanentemente?')) {
-      deleteAd(ad.id);
+      await deleteAdAsync(ad.id);
       showToast('Anúncio apagado com sucesso.');
       router.push('/dashboard');
     }

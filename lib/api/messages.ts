@@ -1,8 +1,8 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Message } from '../types';
 
 export async function getMessagesFromSupabase(userId: string): Promise<Message[]> {
-  if (!isSupabaseConfigured || !supabase || !userId) return [];
+  if (!isSupabaseConfigured || !supabase || !userId || !isValidUuid(userId)) return [];
 
   try {
     const { data, error } = await supabase
@@ -43,11 +43,11 @@ export async function sendMessageToSupabase(data: {
   receiverName: string;
   content: string;
 }): Promise<Message | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(data.senderId) || !isValidUuid(data.receiverId)) return null;
 
   try {
     const payload = {
-      ad_id: data.adId,
+      ad_id: isValidUuid(data.adId) ? data.adId : null,
       ad_title: data.adTitle,
       sender_id: data.senderId,
       sender_name: data.senderName,

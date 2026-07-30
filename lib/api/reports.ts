@@ -1,15 +1,15 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Report } from '../types';
 
 export async function submitReportToSupabase(reportData: Omit<Report, 'id' | 'createdAt' | 'status'>): Promise<Report | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(reportData.reporterId)) return null;
 
   try {
     const payload = {
       reporter_id: reportData.reporterId,
       reporter_name: reportData.reporterName || 'Utilizador',
-      ad_id: reportData.adId || null,
-      reported_user_id: reportData.reportedUserId || null,
+      ad_id: isValidUuid(reportData.adId) ? reportData.adId : null,
+      reported_user_id: isValidUuid(reportData.reportedUserId) ? reportData.reportedUserId : null,
       reason: reportData.reason,
       details: reportData.details || '',
       status: 'pending'
@@ -75,7 +75,7 @@ export async function getReportsFromSupabase(): Promise<Report[]> {
 }
 
 export async function updateReportStatusInSupabase(id: string, status: 'resolved' | 'dismissed'): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(id)) return false;
 
   try {
     const { error } = await supabase

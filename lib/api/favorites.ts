@@ -1,9 +1,9 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Ad } from '../types';
 import { mapAdFromDb } from './ads';
 
 export async function getFavoritesFromSupabase(userId: string): Promise<Ad[]> {
-  if (!isSupabaseConfigured || !supabase || !userId) return [];
+  if (!isSupabaseConfigured || !supabase || !userId || !isValidUuid(userId)) return [];
 
   try {
     const { data: favRows, error: favError } = await supabase
@@ -30,7 +30,7 @@ export async function getFavoritesFromSupabase(userId: string): Promise<Ad[]> {
 }
 
 export async function toggleFavoriteInSupabase(userId: string, adId: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase || !userId || !adId) return false;
+  if (!isSupabaseConfigured || !supabase || !userId || !adId || !isValidUuid(userId) || !isValidUuid(adId)) return false;
 
   try {
     const { data: existing } = await supabase
@@ -60,7 +60,7 @@ export async function toggleFavoriteInSupabase(userId: string, adId: string): Pr
 }
 
 export async function isFavoriteInSupabase(userId: string, adId: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase || !userId || !adId) return false;
+  if (!isSupabaseConfigured || !supabase || !userId || !adId || !isValidUuid(userId) || !isValidUuid(adId)) return false;
 
   try {
     const { data } = await supabase

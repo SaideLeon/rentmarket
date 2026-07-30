@@ -13,8 +13,8 @@ import {
   Star,
   Mail
 } from 'lucide-react';
-import { Ad } from '../../lib/types';
-import { getCurrentUser, sendMessage, getUserReviews } from '../../lib/store';
+import { Ad, Review } from '../../lib/types';
+import { getCurrentUser, sendMessageAsync, getUserReviewsAsync } from '../../lib/store';
 import { useToast } from '../ui/Toast';
 import GmailModal from '../gmail/GmailModal';
 import { notifyAdvertiserNewMessage } from '../../lib/gmailNotifier';
@@ -34,7 +34,13 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
   const [sending, setSending] = useState(false);
   const [showGmailModal, setShowGmailModal] = useState(false);
 
-  const reviews = ad.userId ? getUserReviews(ad.userId) : [];
+  const [reviews, setReviews] = useState<Review[]>([]);
+  useEffect(() => {
+    if (ad.userId) {
+      getUserReviewsAsync(ad.userId).then(setReviews);
+    }
+  }, [ad.userId]);
+
   const avgRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
     : null;
@@ -69,7 +75,7 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
     setSending(true);
     
     // Save in-app message
-    sendMessage({
+    await sendMessageAsync({
       adId: ad.id,
       adTitle: ad.title,
       senderId: currentUser.id,

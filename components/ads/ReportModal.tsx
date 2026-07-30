@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, ShieldAlert, Send } from 'lucide-react';
-import { submitReport, getCurrentUser } from '../../lib/store';
+import { submitReportAsync, getCurrentUser } from '../../lib/store';
 import { useToast } from '../ui/Toast';
 
 interface ReportModalProps {
@@ -19,7 +19,7 @@ export default function ReportModal({ adId, adTitle, reportedUserId, onClose }: 
   const [reason, setReason] = useState<'spam' | 'fraud' | 'inappropriate' | 'fake_contact' | 'other'>('fraud');
   const [details, setDetails] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
       showToast('Por favor, inicie sessão para denunciar.', 'info');
@@ -31,7 +31,7 @@ export default function ReportModal({ adId, adTitle, reportedUserId, onClose }: 
       return;
     }
 
-    submitReport({
+    await submitReportAsync({
       reporterId: currentUser.id,
       reporterName: currentUser.name,
       adId,

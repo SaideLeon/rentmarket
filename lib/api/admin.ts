@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import type { UserProfile } from '../types';
 
 export async function getAllUsersFromSupabase(): Promise<UserProfile[]> {
@@ -39,7 +39,7 @@ export async function getAllUsersFromSupabase(): Promise<UserProfile[]> {
 }
 
 export async function banUserRPC(targetId: string, reason: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(targetId)) return false;
   try {
     const { error } = await supabase.rpc('admin_ban_user', {
       target_id: targetId,
@@ -66,7 +66,7 @@ export async function banUserRPC(targetId: string, reason: string): Promise<bool
 }
 
 export async function unbanUserRPC(targetId: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(targetId)) return false;
   try {
     const { error } = await supabase.rpc('admin_unban_user', {
       target_id: targetId
@@ -91,7 +91,7 @@ export async function unbanUserRPC(targetId: string): Promise<boolean> {
 }
 
 export async function setUserRoleInSupabase(targetId: string, role: 'user' | 'admin'): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(targetId)) return false;
   const { error } = await supabase
     .from('profiles')
     .update({ role })

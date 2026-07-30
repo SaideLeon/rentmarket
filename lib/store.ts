@@ -981,3 +981,74 @@ export async function getUserReviewsAsync(userId: string): Promise<Review[]> {
   }
   return getUserReviews(userId);
 }
+
+export async function deleteAdAsync(id: string): Promise<boolean> {
+  if (isSupabaseConfigured) {
+    return await deleteAdFromSupabase(id);
+  }
+  return deleteAd(id);
+}
+
+export async function renewAdAsync(id: string): Promise<Ad | null> {
+  if (isSupabaseConfigured) {
+    return await updateAdInSupabase(id, {
+      status: 'active',
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+  }
+  return renewAd(id);
+}
+
+export async function sendMessageAsync(data: Parameters<typeof sendMessage>[0]): Promise<void> {
+  if (isSupabaseConfigured) {
+    await sendMessageToSupabase(data);
+    return;
+  }
+  sendMessage(data);
+}
+
+export async function addReviewAsync(reviewData: Omit<Review, 'id' | 'createdAt'>): Promise<Review | null> {
+  if (isSupabaseConfigured) {
+    return await addReviewToSupabase(reviewData);
+  }
+  return addReview(reviewData);
+}
+
+export async function toggleFavoriteAsync(userId: string, adId: string): Promise<boolean> {
+  if (isSupabaseConfigured) {
+    return await toggleFavoriteInSupabase(userId, adId);
+  }
+  return toggleFavorite(userId, adId);
+}
+
+export async function isFavoriteAsync(userId: string, adId: string): Promise<boolean> {
+  if (isSupabaseConfigured) {
+    return await isFavoriteInSupabase(userId, adId);
+  }
+  return isFavorite(userId, adId);
+}
+
+export async function submitReportAsync(reportData: Omit<Report, 'id' | 'createdAt' | 'status'>): Promise<Report | null> {
+  if (isSupabaseConfigured) {
+    return await submitReportToSupabase(reportData);
+  }
+  return submitReport(reportData);
+}
+
+export async function markNotificationReadAsync(id: string): Promise<void> {
+  if (isSupabaseConfigured) {
+    await markNotificationReadInSupabase(id);
+    return;
+  }
+  markNotificationRead(id);
+}
+
+export async function updateUserProfileAsync(
+  userId: string,
+  updates: Partial<UserProfile>
+): Promise<UserProfile | null> {
+  if (isSupabaseConfigured) {
+    return await updateOwnProfileInSupabase(userId, updates);
+  }
+  return updateUserProfile(userId, updates);
+}

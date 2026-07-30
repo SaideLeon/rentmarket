@@ -1,8 +1,8 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Notification } from '../types';
 
 export async function getNotificationsFromSupabase(userId: string): Promise<Notification[]> {
-  if (!isSupabaseConfigured || !supabase || !userId) return [];
+  if (!isSupabaseConfigured || !supabase || !userId || !isValidUuid(userId)) return [];
 
   try {
     const { data, error } = await supabase
@@ -33,7 +33,7 @@ export async function getNotificationsFromSupabase(userId: string): Promise<Noti
 }
 
 export async function addNotificationToSupabase(data: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(data.userId)) return null;
 
   try {
     const payload = {
@@ -73,7 +73,7 @@ export async function addNotificationToSupabase(data: Omit<Notification, 'id' | 
 }
 
 export async function markNotificationReadInSupabase(id: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(id)) return false;
 
   try {
     const { error } = await supabase

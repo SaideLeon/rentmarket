@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { UserProfile } from '../types';
 
 export async function updateOwnProfileInSupabase(
@@ -13,7 +13,7 @@ export async function updateOwnProfileInSupabase(
     city?: string;
   }
 ): Promise<UserProfile | null> {
-  if (!isSupabaseConfigured || !supabase || !userId) return null;
+  if (!isSupabaseConfigured || !supabase || !userId || !isValidUuid(userId)) return null;
 
   try {
     // Whitelist explicitly non-privileged fields

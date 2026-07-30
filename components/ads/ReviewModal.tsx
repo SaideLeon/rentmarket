@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Star, Send } from 'lucide-react';
-import { addReview, getCurrentUser } from '../../lib/store';
+import { addReviewAsync, getCurrentUser } from '../../lib/store';
 import { useToast } from '../ui/Toast';
 
 interface ReviewModalProps {
@@ -21,7 +21,7 @@ export default function ReviewModal({ targetUserId, targetUserName, adId, onClos
   const [comment, setComment] = useState('');
   const [hoverRating, setHoverRating] = useState(0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
       showToast('Por favor, inicie sessão para avaliar.', 'info');
@@ -33,7 +33,7 @@ export default function ReviewModal({ targetUserId, targetUserName, adId, onClos
       return;
     }
 
-    addReview({
+    await addReviewAsync({
       targetUserId,
       authorId: currentUser.id,
       authorName: currentUser.name,

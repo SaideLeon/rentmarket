@@ -1,8 +1,8 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Review } from '../types';
 
 export async function getUserReviewsFromSupabase(userId: string): Promise<Review[]> {
-  if (!isSupabaseConfigured || !supabase || !userId) return [];
+  if (!isSupabaseConfigured || !supabase || !userId || !isValidUuid(userId)) return [];
 
   try {
     const { data, error } = await supabase
@@ -33,7 +33,7 @@ export async function getUserReviewsFromSupabase(userId: string): Promise<Review
 }
 
 export async function addReviewToSupabase(reviewData: Omit<Review, 'id' | 'createdAt'>): Promise<Review | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(reviewData.targetUserId) || !isValidUuid(reviewData.authorId)) return null;
 
   try {
     const payload = {

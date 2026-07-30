@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../supabase';
+import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Ad, AdStatus } from '../types';
 
 export function mapAdFromDb(row: any): Ad {
@@ -69,6 +69,7 @@ export async function getAdsFromSupabase(options?: {
       .order('created_at', { ascending: false });
 
     if (options?.userId) {
+      if (!isValidUuid(options.userId)) return [];
       query = query.eq('user_id', options.userId);
     }
 
@@ -152,7 +153,7 @@ export async function createAdInSupabase(
 }
 
 export async function updateAdInSupabase(id: string, updates: Partial<Ad>): Promise<Ad | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(id)) return null;
 
   try {
     const allowed: Record<string, any> = {};
@@ -189,7 +190,7 @@ export async function updateAdInSupabase(id: string, updates: Partial<Ad>): Prom
 }
 
 export async function deleteAdFromSupabase(id: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(id)) return false;
 
   try {
     const { error } = await supabase.from('ads').delete().eq('id', id);
@@ -205,7 +206,7 @@ export async function deleteAdFromSupabase(id: string): Promise<boolean> {
 }
 
 export async function reviewAdRPC(adId: string, approve: boolean, reason?: string): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(adId)) return false;
 
   try {
     const { error } = await supabase.rpc('admin_review_ad', {
@@ -237,7 +238,7 @@ export async function reviewAdRPC(adId: string, approve: boolean, reason?: strin
 }
 
 export async function boostAdRPC(adId: string, days: number = 30): Promise<boolean> {
-  if (!isSupabaseConfigured || !supabase) return false;
+  if (!isSupabaseConfigured || !supabase || !isValidUuid(adId)) return false;
 
   try {
     const { error } = await supabase.rpc('boost_ad_paid', {
