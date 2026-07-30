@@ -1,23 +1,24 @@
-# QueliMercado (Rent Market Quelimane) 🇲🇿
+# Mussika Online 🇲🇿
 
-**QueliMercado** é uma plataforma marketplace local focada na cidade de Quelimane, Província da Zambézia, Moçambique. Conecta prestadores de serviços independentes (eletricistas, costureiras, explicadores, fretes), comerciantes locais e moradores para a compra, venda e aluguer de produtos e serviços.
+**Mussika Online** é uma plataforma marketplace local de alugueres, serviços e produtos em Moçambique (com foco em Quelimane, Província da Zambézia). Conecta prestadores de serviços independentes (eletricistas, costureiras, explicadores, fretes), comerciantes locais e moradores para a compra, venda e aluguer de produtos e serviços.
 
 ---
 
 ## 🌟 Principais Funcionalidades
 
-- **Pesquisa por Voz**: Pesquisa rápida em Português com reconhecimento de voz via Web Speech API.
-- **Categorias Locais**: Filtros organizados por bairros de Quelimane (Coalane, Sangariveira, Zalala, Brandão, Aeroporto, etc.).
-- **Autenticação Dupla**: Suporte a autenticação nativa Supabase (E-mail/Palavra-passe e Google OAuth) com sincronização para estado local.
-- **Verificação de Identidade Segura**: Envio de documentos (BI/NUIT) para armazenamento em **bucket privado** no Supabase Storage (`documentos`), com geração de URLs assinadas temporárias exclusivamente para administradores.
+- **Progressive Web App (PWA)**: Aplicação instalável em Android, iOS e Desktop, com suporte offline e ícones otimizados (incluindo maskable icons).
+- **Pesquisa Inteligente & por Voz**: Pesquisa por texto e voz em Português via Web Speech API.
+- **Categorias e Bairros Locais**: Filtros de busca por bairros de Quelimane (Coalane, Sangariveira, Zalala, Brandão, Aeroporto, etc.) e modalidade (Aluguer, Venda, Serviço).
+- **Pagamentos Móveis Integrados (PaySuite)**: Integração com M-Pesa, e-Mola e cartões bancários para subscrição de planos e destaque de anúncios.
+- **Autenticação Dupla**: Suporte a autenticação nativa Supabase (E-mail/Palavra-passe e Google OAuth) com sincronização para o estado da aplicação.
+- **Verificação de Identidade Segura**: Envio de documentos (BI/NUIT) para armazenamento seguro e atribuição de selo oficial de verificação.
 - **Painel de Moderação em Tempo Real**:
   - Aprovação e rejeição de anúncios.
-  - Verificação de selos de confiança.
-  - Suspensão e banimento de utilizadores via RPC com desativação automática de anúncios ativos.
-  - Atualização automática via **Supabase Realtime**.
-  - Gráficos de tendências de crescimento de 30 dias com estatísticas diárias e acumuladas.
-- **Contacto Direto**: Botões de chamada e atalhos diretos para conversa no WhatsApp.
-- **Notificações por E-mail (Gmail API)**: Alertas automáticos ao anunciante quando recebe uma nova mensagem.
+  - Verificação de selos de confiança de vendedores/prestadores.
+  - Suspensão e gestão de utilizadores.
+  - Atualizações automáticas em tempo real.
+  - Gráficos e estatísticas de desempenho da plataforma.
+- **Contacto Direto**: Atalhos imediatos para chamadas telefónicas, WhatsApp e envio de e-mails via Gmail API.
 
 ---
 
@@ -28,7 +29,8 @@
 - **Estilização**: Tailwind CSS v4
 - **Backend & Base de Dados**: Supabase Postgres com Row Level Security (RLS)
 - **Autenticação**: Supabase Auth (Email + Google OAuth)
-- **Armazenamento de Ficheiros**: Supabase Storage (Bucket público `anuncios` e bucket privado `documentos`)
+- **Armazenamento de Ficheiros**: Supabase Storage (`anuncios` e `documentos`)
+- **Processamento de Imagens**: Sharp (Geração automatizada de ícones PWA)
 - **Animações e Ícones**: Motion + Lucide React
 - **Gráficos**: Recharts
 
@@ -40,7 +42,7 @@
 
 ```bash
 git clone <url-do-repositorio>
-cd rentmarket
+cd mussika-online
 npm install
 ```
 
@@ -52,25 +54,24 @@ Crie um ficheiro `.env.local` na raiz do projeto baseado no `.env.example`:
 GEMINI_API_KEY="Sua_Chave_Gemini"
 NEXT_PUBLIC_SUPABASE_URL="https://seu-projeto.supabase.co"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="sua-chave-anon-publica"
+PAYSUITE_API_KEY="sua-chave-paysuite"
 ```
 
-### 3. Configurar a Base de Dados Supabase
+### 3. Gerar os Ícones PWA (Opcional)
+
+Para recalcular e gerar os ícones PWA PNG a partir do ícone fonte:
+
+```bash
+node scripts/generate-pwa-icons.js
+```
+
+### 4. Configurar a Base de Dados Supabase
 
 1. Abra o **SQL Editor** no painel do Supabase.
 2. Execute o script contido no ficheiro `supabase-schema.sql`.
 3. No separador **Storage**, certifique-se de criar dois buckets:
    - `anuncios` (Público - para fotografias dos produtos).
    - `documentos` (Privado - para cópias de BI/NUIT dos utilizadores).
-
-### 4. Criar o Primeiro Administrador
-
-No SQL Editor do Supabase, promova a sua conta de utilizador para administrador:
-
-```sql
-UPDATE public.profiles
-SET role = 'admin'
-WHERE email = 'seu-email@dominio.com';
-```
 
 ### 5. Iniciar o Servidor de Desenvolvimento
 
@@ -86,13 +87,12 @@ Aceda a [http://localhost:3000](http://localhost:3000) no seu navegador.
 
 Todas as tabelas do PostgreSQL possuem políticas de **Row Level Security (RLS)** ativas:
 
-- Utilizadores banidos ficam impedidos de publicar anúncios ou enviar mensagens.
-- O bucket `documentos` impede o acesso público direto, exigindo uma URL assinada (`createSignedUrl`) disponibilizada apenas a utilizadores com `role = 'admin'`.
-- A função `is_admin()` utiliza `SECURITY DEFINER` para evitar recursão infinita no RLS.
+- Utilizadores suspensos ficam impedidos de publicar anúncios ou enviar mensagens.
+- O bucket `documentos` impede o acesso público direto, exigindo uma URL assinada disponibilizada apenas a administradores (`role = 'admin'`).
 - O ficheiro `middleware.ts` protege as rotas `/admin` diretamente no servidor.
 
 ---
 
-## 📱 Suporte Mobile
+## 📱 Suporte Mobile & PWA
 
-O projeto inclui navegação responsiva dedicada para dispositivos móveis (`MobileNav.tsx`), botões adaptados para toque e otimização para ecrãs de telemóveis.
+O projeto inclui navegação responsiva dedicada para dispositivos móveis (`MobileNav.tsx`), banner de instalação PWA (`PWAInstaller.tsx`), botões adaptados para toque e suporte completo para ecrãs móveis.
