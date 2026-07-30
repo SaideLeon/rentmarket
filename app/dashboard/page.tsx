@@ -196,7 +196,7 @@ function DashboardContent() {
     const lastMsg = partnerMsgs[partnerMsgs.length - 1];
 
     const receiverName = lastMsg?.senderId === user.id ? lastMsg.receiverName || 'Utilizador' : lastMsg.senderName || 'Utilizador';
-    const adTitle = lastMsg?.adTitle || 'Contacto no Rent Market';
+    const adTitle = lastMsg?.adTitle || 'Contacto no Mussika Online';
     const adId = lastMsg?.adId || 'ad_1';
 
     await sendMessageAsync({
@@ -843,7 +843,7 @@ function DashboardContent() {
               <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
               <h3 className="font-bold text-base">Identidade Verificada!</h3>
               <p className="text-xs text-emerald-800">
-                O seu perfil exibe o selo oficial de verificação da nossa equipa de moderação do Rent Market.
+                O seu perfil exibe o selo oficial de verificação da nossa equipa de moderação do Mussika Online.
               </p>
             </div>
           ) : user.verificationStatus === 'pending' ? (

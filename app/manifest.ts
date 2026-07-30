@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Rent Market',
-    short_name: 'Rent Market',
+    name: 'Mussika Online',
+    short_name: 'Mussika Online',
     description: 'Anúncios, Alugueres, Serviços e Produtos em Moçambique',
     start_url: '/',
     display: 'standalone',

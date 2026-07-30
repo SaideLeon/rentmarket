@@ -17,15 +17,15 @@ export default function Footer() {
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                RM
+                MO
               </div>
               <span className="font-bold text-xl text-white tracking-tight">
-                Rent<span className="text-emerald-400">Market</span>
+                Mussika<span className="text-emerald-400">Online</span>
               </span>
             </div>
 
             <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm">
-              O ponto de encontro digital para profissionais independentes, pequenos negócios, comerciantes e clientes na cidade de Quelimane, Zambézia. Conecte-se diretamente com quem oferece serviços e produtos perto de si.
+              O ponto de encontro digital para profissionais independentes, pequenos negócios, comerciantes e clientes. Conecte-se diretamente com quem oferece serviços e produtos perto de si.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -139,7 +139,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>
-            &copy; {new Date().getFullYear()} Rent Market &middot; Todos os direitos reservados.
+            &copy; {new Date().getFullYear()} Mussika Online &middot; Todos os direitos reservados.
           </p>
           <div className="flex items-center gap-1">
             <span>Desenvolvido para a comunidade de Quelimane</span>

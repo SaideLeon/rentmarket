@@ -30,7 +30,7 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
   const currentUser = getCurrentUser();
 
   const [activeTab, setActiveTab] = useState<'direct' | 'chat' | 'gmail'>('direct');
-  const [messageText, setMessageText] = useState(`Olá ${ad.user?.name.split(' ')[0] || 'anunciante'}, vi o seu anúncio "${ad.title}" no Rent Market e gostaria de saber mais informações.`);
+  const [messageText, setMessageText] = useState(`Olá ${ad.user?.name.split(' ')[0] || 'anunciante'}, vi o seu anúncio "${ad.title}" no Mussika Online e gostaria de saber mais informações.`);
   const [sending, setSending] = useState(false);
   const [showGmailModal, setShowGmailModal] = useState(false);
 
@@ -48,8 +48,8 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
   const rawPhone = ad.whatsapp || ad.phone || '';
   const cleanWhatsappNumber = rawPhone.replace(/[^0-9]/g, '');
   const formattedWhatsappLink = cleanWhatsappNumber.startsWith('258')
-    ? `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(`Olá! Vi o seu anúncio "${ad.title}" no Rent Market.`)}`
-    : `https://wa.me/258${cleanWhatsappNumber}?text=${encodeURIComponent(`Olá! Vi o seu anúncio "${ad.title}" no Rent Market.`)}`;
+    ? `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(`Olá! Vi o seu anúncio "${ad.title}" no Mussika Online.`)}`
+    : `https://wa.me/258${cleanWhatsappNumber}?text=${encodeURIComponent(`Olá! Vi o seu anúncio "${ad.title}" no Mussika Online.`)}`;
 
   const [notifyViaGmail, setNotifyViaGmail] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -305,7 +305,7 @@ export default function ContactModal({ ad, onClose }: ContactModalProps) {
           onClose={() => setShowGmailModal(false)}
           initialTo={ad.user?.email || 'anunciante@rentmarket.co.mz'}
           initialSubject={`Interesse no anúncio: ${ad.title}`}
-          initialBody={`Olá ${ad.user?.name || 'Anunciante'},\n\nEstou interessado no seu anúncio "${ad.title}" disponível no Rent Market.\n\nGostaria de obter mais detalhes sobre o artigo e condições de entrega.\n\nObrigado.`}
+          initialBody={`Olá ${ad.user?.name || 'Anunciante'},\n\nEstou interessado no seu anúncio "${ad.title}" disponível no Mussika Online.\n\nGostaria de obter mais detalhes sobre o artigo e condições de entrega.\n\nObrigado.`}
         />
       )}
     </div>,

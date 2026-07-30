@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       paySuitePayment = await createPaySuitePaymentRequest({
         amountMzn,
         reference,
-        description: `QueliMercado - ${type === 'upgrade_plan' ? 'Plano Pro' : 'Anúncio em Destaque'}`,
+        description: `Mussika Online - ${type === 'upgrade_plan' ? 'Plano Pro' : 'Anúncio em Destaque'}`,
         method: method as PaySuiteMethod,
         phoneNumber,
         callbackUrl: `${appUrl}/api/payments/webhook`,

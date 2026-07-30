@@ -442,7 +442,7 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-xl mx-auto space-y-1">
           <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Simplicidade Digital</span>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Como Funciona o Rent Market?</h2>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Como Funciona o Mussika Online?</h2>
           <p className="text-xs sm:text-sm text-slate-500 font-medium">Pensado para ser fácil de usar, rápido e direto</p>
         </div>
 

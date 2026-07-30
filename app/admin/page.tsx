@@ -124,7 +124,7 @@ export default function AdminPage() {
 
     const user = getCurrentUser();
     if (!user || user.role !== 'admin') {
-      showToast('Acesso restrito a administradores do Rent Market.', 'error');
+      showToast('Acesso restrito a administradores do Mussika Online.', 'error');
       router.push('/login');
       return;
     }

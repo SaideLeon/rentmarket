@@ -15,8 +15,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Rent Market - Anúncios, Alugueres, Serviços e Produtos em Quelimane, Moçambique',
-  description: 'Conecte-se diretamente com eletricistas, cabeleireiros, explicadores, costureiras, vendedores de peixe fresco, capulanas e muito mais na cidade de Quelimane, Zambézia.',
+  title: 'Mussika Online - Anúncios, Alugueres, Serviços e Produtos em Moçambique',
+  description: 'Conecte-se diretamente com eletricistas, cabeleireiros, explicadores, costureiras, vendedores de peixe fresco, capulanas e muito mais em Moçambique.',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'Rent Market',
+    title: 'Mussika Online',
     statusBarStyle: 'default'
   },
   formatDetection: {
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Rent Market" />
+        <meta name="apple-mobile-web-app-title" content="Mussika Online" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body className="bg-slate-50 text-slate-900 font-sans antialiased min-h-screen flex flex-col" suppressHydrationWarning>

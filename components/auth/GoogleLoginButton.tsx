@@ -119,7 +119,7 @@ export function GoogleLoginButton({ label = 'Continuar com Google', className = 
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">Autenticação Google via Supabase</h3>
-                  <p className="text-xs text-slate-500">Integração do Rent Market</p>
+                  <p className="text-xs text-slate-500">Integração do Mussika Online</p>
                 </div>
               </div>
               <button

@@ -15,7 +15,7 @@ export default function PlanosPage() {
       {/* Title */}
       <div className="text-center space-y-3 max-w-2xl mx-auto">
         <span className="text-xs font-bold text-amber-600 uppercase tracking-wider bg-amber-100 px-3 py-1 rounded-full">
-          Cresça no Rent Market
+          Cresça no Mussika Online
         </span>
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
           Planos &amp; Destaques de Anúncios

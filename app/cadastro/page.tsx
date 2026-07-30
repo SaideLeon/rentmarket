@@ -72,7 +72,7 @@ export default function CadastroPage() {
             whatsapp: whatsapp.trim() || phone.trim(),
             bairro,
             city: 'Quelimane',
-            bio: bio.trim() || 'Utilizador do Rent Market',
+            bio: bio.trim() || 'Utilizador do Mussika Online',
             role: 'user',
             plan: 'free'
           });
@@ -88,7 +88,7 @@ export default function CadastroPage() {
           });
 
           setSubmitting(false);
-          showToast(`Conta criada com sucesso! Bem-vindo ao Rent Market, ${newUser.name}!`);
+          showToast(`Conta criada com sucesso! Bem-vindo ao Mussika Online, ${newUser.name}!`);
           router.push('/dashboard');
           return;
         }
@@ -109,7 +109,7 @@ export default function CadastroPage() {
       });
 
       setSubmitting(false);
-      showToast(`Conta criada com sucesso! Bem-vindo ao Rent Market, ${newUser.name}!`);
+      showToast(`Conta criada com sucesso! Bem-vindo ao Mussika Online, ${newUser.name}!`);
       router.push('/dashboard');
     }, 600);
   };
@@ -118,7 +118,7 @@ export default function CadastroPage() {
     <div className="max-w-lg mx-auto px-4 py-12 space-y-6">
       
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Criar Conta no Rent Market</h1>
+        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Criar Conta no Mussika Online</h1>
         <p className="text-xs text-slate-500">Registo gratuito para compradores e anunciantes da cidade</p>
       </div>
 

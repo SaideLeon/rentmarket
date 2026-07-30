@@ -9,7 +9,7 @@ export default function NotFound() {
       <div className="space-y-4 max-w-md">
         <h1 className="text-4xl font-black text-slate-900">404</h1>
         <p className="text-slate-600 font-medium text-sm">
-          A página ou anúncio que procura não foi encontrado no Rent Market.
+          A página ou anúncio que procura não foi encontrado no Mussika Online.
         </p>
         <Link
           href="/"

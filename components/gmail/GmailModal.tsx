@@ -37,8 +37,8 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
 
   // Compose form state
   const [to, setTo] = useState(initialTo);
-  const [subject, setSubject] = useState(initialSubject || 'Consulta - Rent Market');
-  const [body, setBody] = useState(initialBody || 'Olá, estou a contactar através do Rent Market.');
+  const [subject, setSubject] = useState(initialSubject || 'Consulta - Mussika Online');
+  const [body, setBody] = useState(initialBody || 'Olá, estou a contactar através do Mussika Online.');
   const [sending, setSending] = useState(false);
   
   // Confirmation Modal state

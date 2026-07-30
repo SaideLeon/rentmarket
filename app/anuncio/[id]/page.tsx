@@ -112,7 +112,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
     if (navigator.share) {
       navigator.share({
         title: ad.title,
-        text: `Veja este anúncio no Rent Market: ${ad.title}`,
+        text: `Veja este anúncio no Mussika Online: ${ad.title}`,
         url: window.location.href
       }).catch(() => {});
     } else {

@@ -30,7 +30,7 @@ export default function RecuperarSenhaPage() {
         
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-slate-900">Recuperar Palavra-passe</h1>
-          <p className="text-xs text-slate-500">Insira o e-mail ou telemóvel associado à sua conta do Rent Market</p>
+          <p className="text-xs text-slate-500">Insira o e-mail ou telemóvel associado à sua conta do Mussika Online</p>
         </div>
 
         {sent ? (

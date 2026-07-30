@@ -27,16 +27,16 @@ export const Logo: React.FC<LogoProps> = ({
       <div className={`flex items-center gap-2.5 ${className}`}>
         <img
           src="/icon.svg"
-          alt="QueliMercado Logo"
+          alt="Mussika Online Logo"
           className={`${currentSize.box} object-contain transition-transform hover:scale-105`}
         />
         {showText && (
           <div className="flex flex-col leading-none">
             <span className={`font-bold tracking-tight text-slate-900 ${currentSize.text}`}>
-              Queli<span className="text-emerald-600">Mercado</span>
+              Mussika <span className="text-emerald-600">Online</span>
             </span>
             <span className="text-[10px] md:text-xs font-semibold text-slate-500 tracking-wider uppercase mt-0.5">
-              Quelimane 🇲🇿
+              Moçambique 🇲🇿
             </span>
           </div>
         )}
@@ -48,7 +48,7 @@ export const Logo: React.FC<LogoProps> = ({
     <div className={`relative flex items-center justify-center overflow-hidden rounded-xl bg-emerald-600 shadow-xs ${currentSize.box} ${className}`}>
       <img
         src="/icon.svg"
-        alt="QueliMercado Icon"
+        alt="Mussika Online Icon"
         className="w-full h-full object-cover transition-transform hover:scale-105"
       />
     </div>

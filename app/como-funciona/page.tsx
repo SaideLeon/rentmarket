@@ -34,8 +34,8 @@ export default function ComoFuncionaPage() {
 
   const faqs = [
     {
-      question: 'O Rent Market cobra alguma comissão pelos alugueres ou vendas?',
-      answer: 'Não! O Rent Market é uma plataforma local totalmente gratuita para a publicação de anúncios padrão e para o contacto direto entre clientes e prestadores de serviço/proprietários. Não cobramos qualquer comissão sobre os seus negócios.'
+      question: 'O Mussika Online cobra alguma comissão pelos alugueres ou vendas?',
+      answer: 'Não! O Mussika Online é uma plataforma local totalmente gratuita para a publicação de anúncios padrão e para o contacto direto entre clientes e prestadores de serviço/proprietários. Não cobramos qualquer comissão sobre os seus negócios.'
     },
     {
       question: 'Como funciona o processo de Verificação de Perfil?',
@@ -51,7 +51,7 @@ export default function ComoFuncionaPage() {
     },
     {
       question: 'Como posso instalar a aplicação no meu telemóvel Android?',
-      answer: 'O Rent Market é uma PWA (Progressive Web App). Pode clicar no botão "Instalar App Android" no menu superior ou no rodapé, ou aceder ao menu do seu navegador (três pontos) e selecionar "Instalar Aplicação" / "Adicionar ao Ecrã Principal".'
+      answer: 'O Mussika Online é uma PWA (Progressive Web App). Pode clicar no botão "Instalar App Android" no menu superior ou no rodapé, ou aceder ao menu do seu navegador (três pontos) e selecionar "Instalar Aplicação" / "Adicionar ao Ecrã Principal".'
     },
     {
       question: 'Quais são os bairros cobertos pela plataforma em Quelimane?',
@@ -75,7 +75,7 @@ export default function ComoFuncionaPage() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-              Como Funciona o <span className="text-teal-300">Rent Market</span>
+              Como Funciona o <span className="text-teal-300">Mussika Online</span>
             </h1>
             
             <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-8">
@@ -114,7 +114,7 @@ export default function ComoFuncionaPage() {
             Passo a Passo Simples & Direto
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-2">
-            Veja como é fácil começar a utilizar o Rent Market, quer seja um anunciante ou um cliente.
+            Veja como é fácil começar a utilizar o Mussika Online, quer seja um anunciante ou um cliente.
           </p>
         </div>
 
@@ -277,7 +277,7 @@ export default function ComoFuncionaPage() {
         <div className="bg-slate-900 rounded-3xl p-8 sm:p-10 text-white">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-teal-400 text-xs font-bold uppercase tracking-wider">Vantagens Exclusivas</span>
-            <h3 className="text-2xl font-bold mt-1 text-white">Porquê Escolher o Rent Market?</h3>
+            <h3 className="text-2xl font-bold mt-1 text-white">Porquê Escolher o Mussika Online?</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -332,7 +332,7 @@ export default function ComoFuncionaPage() {
             <div>
               <h3 className="text-lg font-bold text-amber-950 mb-1">Dicas Importantes de Segurança</h3>
               <p className="text-xs sm:text-sm text-amber-900 leading-relaxed mb-4">
-                Queremos que todos os negócios realizados no Rent Market decorram com máxima segurança e confiança. Siga sempre estas boas práticas:
+                Queremos que todos os negócios realizados no Mussika Online decorram com máxima segurança e confiança. Siga sempre estas boas práticas:
               </p>
               
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-amber-900 font-medium">

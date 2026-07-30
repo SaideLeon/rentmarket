@@ -248,7 +248,7 @@ export default function PaymentModal({ type, adId, adTitle, onClose, onSuccess }
 
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Transação Segura &amp; Encriptada no Rent Market</span>
+              <span>Transação Segura &amp; Encriptada no Mussika Online</span>
             </div>
 
           </form>

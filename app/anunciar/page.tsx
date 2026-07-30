@@ -170,7 +170,7 @@ export default function AnunciarPage() {
       {/* Title */}
       <div className="text-center space-y-2">
         <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">Publicação Rápida</span>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Anunciar no Rent Market</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Anunciar no Mussika Online</h1>
         <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
           Preencha as informações do seu produto ou serviço para divulgar a todos os moradores da cidade.
         </p>

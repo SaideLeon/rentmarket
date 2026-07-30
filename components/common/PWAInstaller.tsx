@@ -125,7 +125,7 @@ export default function PWAInstaller() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 mb-0.5">
-                <h3 className="font-bold text-sm text-white">Instalar App Rent Market</h3>
+                <h3 className="font-bold text-sm text-white">Instalar App Mussika Online</h3>
                 <span className="bg-teal-500/20 text-teal-300 text-[10px] font-semibold px-2 py-0.5 rounded-full border border-teal-400/30">
                   Android & Web
                 </span>
@@ -178,8 +178,8 @@ export default function PWAInstaller() {
                 <Smartphone className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Instalar Rent Market</h2>
-                <p className="text-xs text-slate-500">Aplicação Web Progressiva (PWA) de Quelimane</p>
+                <h2 className="text-xl font-bold text-slate-900">Instalar Mussika Online</h2>
+                <p className="text-xs text-slate-500">Aplicação Web Progressiva (PWA)</p>
               </div>
             </div>
 
@@ -226,7 +226,7 @@ export default function PWAInstaller() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="font-bold text-slate-900">3.</span>
-                  <span>Confirme em <strong>&quot;Instalar&quot;</strong>. O ícone do Rent Market aparecerá com as suas restantes aplicações.</span>
+                  <span>Confirme em <strong>&quot;Instalar&quot;</strong>. O ícone do Mussika Online aparecerá com as suas restantes aplicações.</span>
                 </li>
               </ol>
             </div>

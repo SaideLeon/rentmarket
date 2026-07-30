@@ -57,10 +57,10 @@ export async function notifyAdvertiserNewMessage({
     };
   }
 
-  const emailSubject = `[Rent Market] Nova Mensagem sobre: "${adTitle}"`;
+  const emailSubject = `[Mussika Online] Nova Mensagem sobre: "${adTitle}"`;
   const emailBody = `Olá ${receiverName},
 
-Você recebeu uma nova mensagem de contacto de um cliente no Rent Market!
+Você recebeu uma nova mensagem de contacto de um cliente no Mussika Online!
 
 --------------------------------------------------
 DADOS DA MENSAGEM:
@@ -72,12 +72,12 @@ DADOS DA MENSAGEM:
 --------------------------------------------------
 COMO RESPONDER:
 --------------------------------------------------
-Pode responder diretamente a esta mensagem ou aceder ao painel de controlo do Rent Market:
-https://rentmarket.co.mz/dashboard?tab=messages
+Pode responder diretamente a esta mensagem ou aceder ao painel de controlo do Mussika Online:
+https://mussika.co.mz/dashboard?tab=messages
 
 Atenciosamente,
-Equipa Rent Market
-https://rentmarket.co.mz`;
+Equipa Mussika Online
+https://mussika.co.mz`;
 
   try {
     await sendGmailEmail({

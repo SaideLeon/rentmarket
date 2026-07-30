@@ -201,7 +201,7 @@ export function registerUser(data: {
     avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300`,
     bairro: data.bairro || QUELIMANE_BAIRROS[0],
     city: 'Quelimane',
-    bio: data.bio || 'Utilizador do QueliMercado',
+    bio: data.bio || 'Utilizador do Mussika Online',
     role: data.role || 'user',
     plan: 'free',
     verificationStatus: 'none',

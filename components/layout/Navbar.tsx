@@ -128,13 +128,13 @@ export default function Navbar() {
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl overflow-hidden flex items-center justify-center bg-emerald-600 shadow-xs group-hover:scale-105 transition">
                 <img
                   src="/icon.svg"
-                  alt="QueliMercado Logo SVG"
+                  alt="Mussika Online Logo SVG"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="flex flex-col">
                 <span className="text-base md:text-xl font-bold tracking-tight text-slate-800 leading-none group-hover:text-emerald-600 transition">
-                  Rent <span className="text-emerald-600">Market</span>
+                  Mussika <span className="text-emerald-600">Online</span>
                 </span>
                 <span className="hidden sm:block text-[10px] text-emerald-600 font-medium uppercase tracking-wider -mt-0.5">
                   Anúncios &amp; Serviços
