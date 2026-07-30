@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Phone, Mail, ShieldCheck, Sparkles } from 'lucide-react';
+import { MapPin, Phone, Mail, ShieldCheck, Sparkles, Smartphone, Download } from 'lucide-react';
+import { triggerPwaInstall } from '../common/PWAInstaller';
 
 export default function Footer() {
   return (
@@ -27,15 +28,18 @@ export default function Footer() {
               O ponto de encontro digital para profissionais independentes, pequenos negócios, comerciantes e clientes na cidade de Quelimane, Zambézia. Conecte-se diretamente com quem oferece serviços e produtos perto de si.
             </p>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-2">
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-slate-200 rounded-lg text-xs font-semibold">
                 <MapPin className="w-4 h-4 text-emerald-400" />
                 <span>Quelimane, Moçambique</span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-slate-200 rounded-lg text-xs font-semibold">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Anúncios Verificados</span>
-              </div>
+              <button
+                onClick={() => triggerPwaInstall()}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+              >
+                <Smartphone className="w-4 h-4" />
+                <span>Instalar App Android</span>
+              </button>
             </div>
           </div>
 

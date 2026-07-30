@@ -21,8 +21,10 @@ import {
   SlidersHorizontal,
   Home,
   Store,
-  Mail
+  Mail,
+  Smartphone
 } from 'lucide-react';
+import { triggerPwaInstall } from '../common/PWAInstaller';
 import { getCurrentUser, getAllUsers, setCurrentUser, logoutUser, getNotificationsAsync, getMessagesAsync } from '../../lib/store';
 import { UserProfile } from '../../lib/types';
 import GmailModal from '../gmail/GmailModal';
@@ -96,6 +98,14 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-4 text-emerald-200">
+            <button
+              onClick={() => triggerPwaInstall()}
+              className="hover:text-white transition flex items-center gap-1 font-semibold text-amber-300"
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Instalar App Android</span>
+            </button>
+            <span>&bull;</span>
             <Link href="/como-funciona" className="hover:text-white transition">
               Como Funciona
             </Link>
@@ -439,6 +449,16 @@ export default function Navbar() {
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Planos de Destaque</span>
             </Link>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                triggerPwaInstall();
+              }}
+              className="flex items-center gap-2 p-2 bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-lg font-bold border border-teal-200 transition"
+            >
+              <Smartphone className="w-4 h-4 text-teal-600" />
+              <span>Instalar Aplicação Android / iOS</span>
+            </button>
             <Link 
               href="/como-funciona" 
               onClick={() => setMobileMenuOpen(false)}

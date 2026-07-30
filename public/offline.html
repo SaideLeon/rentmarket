@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sem Ligação à Internet | Rent Market</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+      text-align: center;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 32px 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      border: 1px solid #e2e8f0;
+    }
+    .icon-wrapper {
+      width: 72px;
+      height: 72px;
+      background-color: #ccfbf1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+    }
+    .icon-wrapper svg {
+      width: 36px;
+      height: 36px;
+      color: #0d9488;
+    }
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    p {
+      font-size: 15px;
+      color: #64748b;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background-color: #0d9488;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 600;
+      padding: 14px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .btn:active {
+      background-color: #0f766e;
+    }
+    .tips {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #f1f5f9;
+      text-align: left;
+    }
+    .tips h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+    .tips ul {
+      list-style-position: inside;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-wrapper">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a5 5 0 010-7.072m0 0l2.829 2.829M3 3l18 18M3 12a9 9 0 0115.364-6.364"></path>
+      </svg>
+    </div>
+    <h1>Sem Ligação à Internet</h1>
+    <p>Parece que o seu dispositivo está offline. Verifique a sua ligação Wi-Fi ou dados móveis para continuar no Rent Market Quelimane.</p>
+    
+    <button class="btn" onclick="window.location.reload()">
+      Tentar Novamente
+    </button>
+
+    <div class="tips">
+      <h2>Sugestões</h2>
+      <ul>
+        <li>Verifique se o modo de avião está desativado</li>
+        <li>Verifique a ligação aos dados móveis ou rede Wi-Fi</li>
+        <li>O Rent Market continuará a carregar os dados assim que voltar online</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
