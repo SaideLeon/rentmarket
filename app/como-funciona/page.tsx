@@ -34,12 +34,12 @@ export default function ComoFuncionaPage() {
 
   const faqs = [
     {
-      question: 'O Rent Market Quelimane cobra alguma comissão pelos alugueres ou vendas?',
+      question: 'O Rent Market cobra alguma comissão pelos alugueres ou vendas?',
       answer: 'Não! O Rent Market é uma plataforma local totalmente gratuita para a publicação de anúncios padrão e para o contacto direto entre clientes e prestadores de serviço/proprietários. Não cobramos qualquer comissão sobre os seus negócios.'
     },
     {
       question: 'Como funciona o processo de Verificação de Perfil?',
-      answer: 'Para aumentar a confiança entre os utilizadores de Quelimane, pode submeter uma foto do seu documento de identificação (BI ou Passaporte). A nossa equipa valida o documento em até 24h e atribui-lhe o selo de "Utilizador Verificado", o que gera muito mais contactos dos clientes.'
+      answer: 'Para aumentar a confiança entre os utilizadores, pode submeter uma foto do seu documento de identificação (BI ou Passaporte). A nossa equipa valida o documento em até 24h e atribui-lhe o selo de "Utilizador Verificado", o que gera muito mais contactos dos clientes.'
     },
     {
       question: 'Como é que os clientes entram em contacto comigo?',
@@ -54,8 +54,8 @@ export default function ComoFuncionaPage() {
       answer: 'O Rent Market é uma PWA (Progressive Web App). Pode clicar no botão "Instalar App Android" no menu superior ou no rodapé, ou aceder ao menu do seu navegador (três pontos) e selecionar "Instalar Aplicação" / "Adicionar ao Ecrã Principal".'
     },
     {
-      question: 'Quais são os bairros de Quelimane cobertos pela plataforma?',
-      answer: 'Cobrimos todos os bairros e zonas de Quelimane, incluindo Central, Alto Molócue, Coalane, Sagrada Família, Sangariveira, Aeroporto, Brandão, Torrone, Icundu, Madal, Mucelo e arredores.'
+      question: 'Quais são os bairros cobertos pela plataforma em Quelimane?',
+      answer: 'Cobrimos os bairros oficiais da cidade de Quelimane, incluindo Central, Coalane, Aeroporto, 24 de Julho, Chuabo Dembe, Ícidua, Sangariveira, Sinacura, Torrone, Floresta, Manhaua, Micajune, Sampene, Maquival e zonas limítrofes.'
     }
   ];
 
@@ -75,11 +75,11 @@ export default function ComoFuncionaPage() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-              Como Funciona o <span className="text-teal-300">Rent Market</span> Quelimane
+              Como Funciona o <span className="text-teal-300">Rent Market</span>
             </h1>
             
             <p className="text-base sm:text-lg text-slate-200 leading-relaxed mb-8">
-              Conectamos proprietários, prestadores de serviços, artesãos e comerciantes diretamente a quem procura alugar casas, contratar serviços ou comprar produtos na cidade de Quelimane. Sem intermediários nem complicações.
+              Conectamos proprietários, prestadores de serviços, artesãos e comerciantes diretamente a quem procura alugar casas, contratar serviços ou comprar produtos. Sem intermediários nem complicações.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -114,7 +114,7 @@ export default function ComoFuncionaPage() {
             Passo a Passo Simples & Direto
           </h2>
           <p className="text-slate-600 text-sm sm:text-base mt-2">
-            Veja como é fácil começar a utilizar o Rent Market Quelimane, quer seja um anunciante ou um cliente.
+            Veja como é fácil começar a utilizar o Rent Market, quer seja um anunciante ou um cliente.
           </p>
         </div>
 
@@ -154,7 +154,7 @@ export default function ComoFuncionaPage() {
                   <div>
                     <h4 className="font-semibold text-slate-900 text-sm">Publique o Anúncio</h4>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      Adicione fotografias nítidas, escolha o bairro de Quelimane, fixe o preço (diário ou mensal) e especifique os detalhes.
+                      Adicione fotografias nítidas, escolha o bairro, fixe o preço (diário ou mensal) e especifique os detalhes.
                     </p>
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export default function ComoFuncionaPage() {
                   <div>
                     <h4 className="font-semibold text-slate-900 text-sm">Pesquise por Bairro ou Categoria</h4>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      Filtre ofertas no bairro Central, Coalane, Alto Molócue ou procure pelo tipo de serviço necessário.
+                      Filtre ofertas em bairros como Central, Coalane, Aeroporto, 24 de Julho ou pelo tipo de serviço necessário.
                     </p>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ export default function ComoFuncionaPage() {
         <div className="bg-slate-900 rounded-3xl p-8 sm:p-10 text-white">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-teal-400 text-xs font-bold uppercase tracking-wider">Vantagens Exclusivas</span>
-            <h3 className="text-2xl font-bold mt-1 text-white">Porquê Escolher o Rent Market Quelimane?</h3>
+            <h3 className="text-2xl font-bold mt-1 text-white">Porquê Escolher o Rent Market?</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -287,7 +287,7 @@ export default function ComoFuncionaPage() {
               </div>
               <h4 className="font-bold text-sm text-white mb-1">Perfis Verificados</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Sistema de verificação de identidade com BI/Passaporte para garantir anúncios legítimos em Quelimane.
+                Sistema de verificação de identidade com BI/Passaporte para garantir anúncios legítimos.
               </p>
             </div>
 
@@ -295,9 +295,9 @@ export default function ComoFuncionaPage() {
               <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
                 <MapPin className="w-5 h-5" />
               </div>
-              <h4 className="font-bold text-sm text-white mb-1">Foco Local Quelimane</h4>
+              <h4 className="font-bold text-sm text-white mb-1">Foco Local & Proximidade</h4>
               <p className="text-xs text-slate-300 leading-relaxed">
-                Filtros específicos por bairros conhecidos da cidade para encontrar negócios perto de si.
+                Filtros específicos por bairros conhecidos para encontrar negócios perto de si.
               </p>
             </div>
 
@@ -330,7 +330,7 @@ export default function ComoFuncionaPage() {
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-amber-950 mb-1">Dicas Importantes de Segurança em Quelimane</h3>
+              <h3 className="text-lg font-bold text-amber-950 mb-1">Dicas Importantes de Segurança</h3>
               <p className="text-xs sm:text-sm text-amber-900 leading-relaxed mb-4">
                 Queremos que todos os negócios realizados no Rent Market decorram com máxima segurança e confiança. Siga sempre estas boas práticas:
               </p>
@@ -338,7 +338,7 @@ export default function ComoFuncionaPage() {
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-amber-900 font-medium">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Marque os encontros em locais públicos e movimentados de Quelimane.</span>
+                  <span>Marque os encontros em locais públicos e movimentados.</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
@@ -396,10 +396,10 @@ export default function ComoFuncionaPage() {
         <div className="bg-teal-700 rounded-3xl p-8 sm:p-12 text-center text-white relative overflow-hidden shadow-xl">
           <div className="relative z-10 max-w-2xl mx-auto">
             <h3 className="text-2xl sm:text-4xl font-extrabold mb-3">
-              Pronto para dinamizar o seu negócio em Quelimane?
+              Pronto para dinamizar o seu negócio?
             </h3>
             <p className="text-teal-100 text-sm sm:text-base mb-8">
-              Junte-se à maior comunidade local de alugueres, produtos e prestadores de serviços da Zambézia.
+              Junte-se à maior comunidade de alugueres, produtos e prestadores de serviços.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link 

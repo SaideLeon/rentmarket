@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Rent Market - Quelimane',
+    name: 'Rent Market',
     short_name: 'Rent Market',
-    description: 'Anúncios, Alugueres, Serviços e Produtos na cidade de Quelimane, Moçambique',
+    description: 'Anúncios, Alugueres, Serviços e Produtos em Moçambique',
     start_url: '/',
     display: 'standalone',
     background_color: '#f8fafc',
