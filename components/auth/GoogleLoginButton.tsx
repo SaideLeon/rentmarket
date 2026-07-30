@@ -12,7 +12,7 @@ interface GoogleLoginButtonProps {
   className?: string;
 }
 
-export function GoogleLoginButton({ label = 'Continuar com Google', className = '' }: GoogleLoginButtonProps) {
+export function GoogleLoginButton({ label = 'Fazer login com Google', className = '' }: GoogleLoginButtonProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -42,12 +42,12 @@ export function GoogleLoginButton({ label = 'Continuar com Google', className = 
           throw error;
         }
       } catch (err: any) {
-        console.error('Erro Supabase Google Auth:', err);
-        showToast(err.message || 'Erro ao ligar ao Google via Supabase', 'error');
+        console.error('Erro Google Auth:', err);
+        showToast(err.message || 'Erro ao ligar ao Google', 'error');
         setLoading(false);
       }
     } else {
-      // Supabase credentials not set in .env yet -> show interactive options
+      // Credentials not set in .env yet -> show interactive options
       setLoading(false);
       setShowConfigModal(true);
     }
@@ -99,15 +99,9 @@ export function GoogleLoginButton({ label = 'Continuar com Google', className = 
         </svg>
 
         <span>{loading ? 'A conectar...' : label}</span>
-
-        {/* Supabase Indicator Badge */}
-        <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-200/80">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          Supabase
-        </span>
       </button>
 
-      {/* Supabase OAuth Status / Demo Modal */}
+      {/* OAuth Status / Demo Modal */}
       {showConfigModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-200">
@@ -118,8 +112,8 @@ export function GoogleLoginButton({ label = 'Continuar com Google', className = 
                   <Shield className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">Autenticação Google via Supabase</h3>
-                  <p className="text-xs text-slate-500">Integração do Mussika Online</p>
+                  <h3 className="text-base font-bold text-slate-900">Autenticação Google</h3>
+                  <p className="text-xs text-slate-500">Mussika Online</p>
                 </div>
               </div>
               <button
@@ -136,7 +130,7 @@ export function GoogleLoginButton({ label = 'Continuar com Google', className = 
                 <span>Integração de Login Pronta</span>
               </div>
               <p className="text-slate-600 leading-relaxed">
-                A funcionalidade de <strong>Login com Google (Supabase Auth)</strong> está implementada no código e configurada no SDK oficial <code className="bg-slate-200 text-slate-800 px-1 rounded">@supabase/supabase-js</code>.
+                A funcionalidade de <strong>Login com Google</strong> está implementada no código e pronta a ser utilizada.
               </p>
             </div>
 

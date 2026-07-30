@@ -54,7 +54,7 @@ export default function AuthCallbackPage() {
           const profile = await resolveProfile(session.user);
           if (isMounted) {
             setStatus('success');
-            showToast(`Bem-vindo, ${profile.name}! Autenticado via Google Supabase.`);
+            showToast(`Bem-vindo, ${profile.name}! Autenticado com o Google.`);
             setTimeout(() => {
               router.push(profile.role === 'admin' ? '/admin' : '/dashboard');
             }, 600);
@@ -65,7 +65,7 @@ export default function AuthCallbackPage() {
             if (session && session.user && isMounted) {
               const profile = await resolveProfile(session.user);
               setStatus('success');
-              showToast(`Bem-vindo, ${profile.name}! Autenticado via Google Supabase.`);
+              showToast(`Bem-vindo, ${profile.name}! Autenticado com o Google.`);
               setTimeout(() => {
                 router.push(profile.role === 'admin' ? '/admin' : '/dashboard');
               }, 600);
@@ -74,10 +74,10 @@ export default function AuthCallbackPage() {
           });
         }
       } catch (err: any) {
-        console.error('Erro no callback de autenticação Supabase:', err);
+        console.error('Erro no callback de autenticação:', err);
         if (isMounted) {
           setStatus('error');
-          setErrorMsg(err.message || 'Falha ao autenticar com o Google via Supabase.');
+          setErrorMsg(err.message || 'Falha ao autenticar com o Google.');
         }
       }
     };
@@ -98,7 +98,7 @@ export default function AuthCallbackPage() {
             <Loader2 className="w-10 h-10 text-emerald-600 animate-spin mx-auto" />
             <div>
               <h2 className="text-lg font-bold text-slate-900">A Autenticar com o Google...</h2>
-              <p className="text-xs text-slate-500 mt-1">A processar os dados da conta através do Supabase</p>
+              <p className="text-xs text-slate-500 mt-1">A processar os dados da conta...</p>
             </div>
           </div>
         )}

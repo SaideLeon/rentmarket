@@ -120,9 +120,9 @@ export default function LoginPage() {
       {/* Main Form */}
       <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
         
-        {/* Google Supabase Login Option */}
+        {/* Google Login Option */}
         <div className="space-y-3">
-          <GoogleLoginButton label="Entrar com Google (Supabase)" />
+          <GoogleLoginButton label="Fazer login com Google" />
           
           <div className="relative flex items-center justify-center">
             <div className="border-t border-slate-200 w-full" />
