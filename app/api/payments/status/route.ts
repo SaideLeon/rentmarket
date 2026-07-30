@@ -60,17 +60,19 @@ export async function GET(req: NextRequest) {
 
     const authUser = await getAuthenticatedUser(req);
 
-    let query = supabase
-      .from('payments')
-      .select('id, status, type, amount_mzn, created_at, confirmed_at, user_id')
-      .eq('id', paymentId);
-
-    // Filter by caller user_id if authenticated
-    if (authUser?.id) {
-      query = query.eq('user_id', authUser.id);
+    if (!authUser) {
+      return NextResponse.json(
+        { error: 'Não autenticado. Sessão inválida ou expirada.' },
+        { status: 401 }
+      );
     }
 
-    const { data, error } = await query.maybeSingle();
+    const { data, error } = await supabase
+      .from('payments')
+      .select('id, status, type, amount_mzn, created_at, confirmed_at, user_id')
+      .eq('id', paymentId)
+      .eq('user_id', authUser.id)
+      .maybeSingle();
 
     if (error || !data) {
       return NextResponse.json({ error: 'Pagamento não encontrado ou não autorizado.' }, { status: 404 });

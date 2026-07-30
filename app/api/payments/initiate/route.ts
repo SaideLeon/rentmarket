@@ -52,17 +52,18 @@ const PRICES: Record<string, number> = {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userId: bodyUserId, type, adId, method, phoneNumber } = body;
+    const { type, adId, method, phoneNumber } = body;
 
     const authenticatedUser = await getAuthenticatedUser(req);
-    const userId = authenticatedUser?.id || bodyUserId;
 
-    if (!userId) {
+    if (!authenticatedUser) {
       return NextResponse.json(
-        { error: 'Não autenticado ou ID de utilizador em falta.' },
+        { error: 'Não autenticado. Sessão inválida ou expirada.' },
         { status: 401 }
       );
     }
+
+    const userId = authenticatedUser.id;
 
     if (!type || !method) {
       return NextResponse.json(
