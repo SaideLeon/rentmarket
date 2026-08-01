@@ -34,6 +34,7 @@ import AdCard from '../components/ads/AdCard';
 import ContactModal from '../components/ads/ContactModal';
 import { QUELIMANE_BAIRROS } from '../lib/data/initialData';
 import { useToast } from '../components/ui/Toast';
+import Lightfall from '../components/Lightfall';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   Hammer: <Hammer className="w-6 h-6 text-emerald-600" />,
@@ -174,8 +175,32 @@ export default function HomePage() {
       {/* HERO SECTION */}
       <section className="relative bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-900 text-white overflow-hidden pt-12 pb-16 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/50">
         
+        {/* WebGL Lightfall Background Animation */}
+        <div className="absolute inset-0 pointer-events-none opacity-50 z-0">
+          <Lightfall
+            colors={['#A6C8FF', '#5227FF', '#FF9FFC']}
+            backgroundColor="#0b221a"
+            speed={0.5}
+            streakCount={2}
+            streakWidth={1}
+            streakLength={1}
+            glow={1}
+            density={0.6}
+            twinkle={1}
+            zoom={3}
+            backgroundGlow={0.5}
+            opacity={1}
+            mouseInteraction={true}
+            mouseStrength={0.5}
+            mouseRadius={1}
+            color1="#a6ffc1"
+            color2="#30ff27"
+            color3="#101141"
+          />
+        </div>
+
         {/* Subtle Background Decoration */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.15),transparent_50%)] pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.15),transparent_50%)] pointer-events-none z-0"></div>
 
         <div className="max-w-5xl mx-auto relative z-10 text-center space-y-6">
           
