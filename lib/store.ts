@@ -188,6 +188,7 @@ export function registerUser(data: {
   phone: string;
   whatsapp: string;
   bairro: string;
+  city?: string;
   bio?: string;
   role?: UserRole;
 }): UserProfile {
@@ -200,7 +201,7 @@ export function registerUser(data: {
     whatsapp: data.whatsapp || data.phone.replace(/[^0-9]/g, ''),
     avatarUrl: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=300`,
     bairro: data.bairro || QUELIMANE_BAIRROS[0],
-    city: 'Quelimane',
+    city: data.city || 'Quelimane',
     bio: data.bio || 'Utilizador do Mussika Online',
     role: data.role || 'user',
     plan: 'free',
@@ -391,6 +392,7 @@ export function updateUserProfile(userId: string, updates: Partial<UserProfile>)
 export function getAds(options?: {
   categoryId?: string;
   subcategory?: string;
+  city?: string;
   bairro?: string;
   bairros?: string[];
   listingType?: string;
@@ -425,6 +427,9 @@ export function getAds(options?: {
     if (options.subcategory) {
       ads = ads.filter(ad => ad.subcategory === options.subcategory);
     }
+    if (options.city && options.city !== 'Todas' && options.city !== 'Todas as Cidades') {
+      ads = ads.filter(ad => (ad.city || 'Quelimane').toLowerCase() === options.city?.toLowerCase());
+    }
     if (options.bairros && options.bairros.length > 0) {
       const allowedBairros = options.bairros.map(b => b.toLowerCase());
       ads = ads.filter(ad => allowedBairros.includes(ad.bairro.toLowerCase()));
@@ -454,6 +459,7 @@ export function getAds(options?: {
         ad.title.toLowerCase().includes(q) ||
         ad.description.toLowerCase().includes(q) ||
         ad.bairro.toLowerCase().includes(q) ||
+        (ad.city && ad.city.toLowerCase().includes(q)) ||
         ad.subcategory.toLowerCase().includes(q) ||
         (ad.categoryName && ad.categoryName.toLowerCase().includes(q))
       );

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, Trash2, PauseCircle, PlayCircle } from 'lucide-react';
 import { initializeStore, getAdById, getAdByIdAsync, updateAdAsync, deleteAdAsync, getCurrentUser } from '../../../../lib/store';
 import { Ad } from '../../../../lib/types';
-import { QUELIMANE_BAIRROS } from '../../../../lib/data/initialData';
+import { MOZAMBIQUE_CIDADES, getBairrosPorCidade } from '../../../../lib/data/initialData';
 import { useToast } from '../../../../components/ui/Toast';
 import { ProductImageUploader } from '../../../../components/ads/ProductImageUploader';
 import Link from 'next/link';
@@ -24,6 +24,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
   const [description, setDescription] = useState('');
   const [priceInput, setPriceInput] = useState('');
   const [priceType, setPriceType] = useState<'fixed' | 'negotiable' | 'starting_at'>('fixed');
+  const [city, setCity] = useState('Quelimane');
   const [bairro, setBairro] = useState('');
   const [status, setStatus] = useState<any>('active');
   const [images, setImages] = useState<string[]>([]);
@@ -45,6 +46,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
         setDescription(loadedAd.description);
         setPriceInput(loadedAd.price ? loadedAd.price.toString() : '');
         setPriceType(loadedAd.priceType || 'fixed');
+        setCity(loadedAd.city || 'Quelimane');
         setBairro(loadedAd.bairro);
         setStatus(loadedAd.status);
         const adImages = loadedAd.images && loadedAd.images.length > 0 ? loadedAd.images : [loadedAd.coverImage];
@@ -80,6 +82,7 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
       description: description.trim(),
       price: numericPrice,
       priceType,
+      city,
       bairro,
       status,
       images: finalImages,
@@ -171,15 +174,33 @@ export default function EditAdPage({ params }: { params: Promise<{ id: string }>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Bairro em Quelimane:</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Cidade:</label>
+              <select
+                value={city}
+                onChange={(e) => {
+                  const newCity = e.target.value;
+                  setCity(newCity);
+                  const newBairros = getBairrosPorCidade(newCity);
+                  setBairro(newBairros[0] || '');
+                }}
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                {MOZAMBIQUE_CIDADES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Bairro:</label>
               <select
                 value={bairro}
                 onChange={(e) => setBairro(e.target.value)}
                 className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-600"
               >
-                {QUELIMANE_BAIRROS.map(b => (
+                {getBairrosPorCidade(city).map(b => (
                   <option key={b} value={b}>{b}</option>
                 ))}
               </select>

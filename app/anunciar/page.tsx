@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { initializeStore, getCategories, createAd, createAdAsync, getCurrentUser } from '../../lib/store';
 import { Category, ListingType, UserProfile } from '../../lib/types';
-import { QUELIMANE_BAIRROS } from '../../lib/data/initialData';
+import { MOZAMBIQUE_CIDADES, getBairrosPorCidade } from '../../lib/data/initialData';
 import { useToast } from '../../components/ui/Toast';
 import { ProductImageUploader } from '../../components/ads/ProductImageUploader';
 
@@ -37,7 +37,8 @@ export default function AnunciarPage() {
   const [priceType, setPriceType] = useState<'fixed' | 'negotiable' | 'starting_at'>('fixed');
   const [priceInput, setPriceInput] = useState('');
   
-  const [bairro, setBairro] = useState(QUELIMANE_BAIRROS[0]);
+  const [city, setCity] = useState('Quelimane');
+  const [bairro, setBairro] = useState('');
   const [phone, setPhone] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
 
@@ -62,7 +63,10 @@ export default function AnunciarPage() {
       setUser(currentUser);
       setPhone(currentUser.phone || '');
       setWhatsapp(currentUser.whatsapp || currentUser.phone || '');
-      setBairro(currentUser.bairro || QUELIMANE_BAIRROS[0]);
+      const initialCity = currentUser.city || 'Quelimane';
+      setCity(initialCity);
+      const bairrosList = getBairrosPorCidade(initialCity);
+      setBairro(currentUser.bairro && bairrosList.includes(currentUser.bairro) ? currentUser.bairro : bairrosList[0]);
 
       const cats = getCategories();
       setCategories(cats);
@@ -148,7 +152,8 @@ export default function AnunciarPage() {
         subcategory,
         price: numericPrice,
         priceType,
-        bairro,
+        city: city || 'Quelimane',
+        bairro: bairro || getBairrosPorCidade(city)[0],
         images: imageUrls.length > 0 ? imageUrls : ['https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&q=80&w=800'],
         coverImage: imageUrls[coverIndex] || imageUrls[0] || 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&q=80&w=800',
         phone: phone.trim(),
@@ -317,19 +322,41 @@ export default function AnunciarPage() {
             )}
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
-              Bairro de Localização em Quelimane:
-            </label>
-            <select
-              value={bairro}
-              onChange={(e) => setBairro(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
-            >
-              {QUELIMANE_BAIRROS.map(b => (
-                <option key={b} value={b}>{b}</option>
-              ))}
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Cidade:
+              </label>
+              <select
+                value={city}
+                onChange={(e) => {
+                  const newCity = e.target.value;
+                  setCity(newCity);
+                  const newBairros = getBairrosPorCidade(newCity);
+                  setBairro(newBairros[0] || '');
+                }}
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                {MOZAMBIQUE_CIDADES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Bairro de Localização:
+              </label>
+              <select
+                value={bairro}
+                onChange={(e) => setBairro(e.target.value)}
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                {getBairrosPorCidade(city).map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 

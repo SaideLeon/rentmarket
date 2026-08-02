@@ -1,5 +1,12 @@
 import { Ad, Category, UserProfile, Review, SystemSettings } from '../types';
 
+export const MOZAMBIQUE_CIDADES = [
+  'Quelimane',
+  'Maputo Cidade'
+] as const;
+
+export type CidadeName = typeof MOZAMBIQUE_CIDADES[number];
+
 export const QUELIMANE_BAIRROS = [
   'Centro da Cidade',
   '1º de Maio',
@@ -50,6 +57,93 @@ export const QUELIMANE_BAIRROS = [
   'Torrone Novo',
   'Torrone Velho'
 ];
+
+export const MAPUTO_BAIRROS = [
+  // KaMpfumu
+  'Alto Maé A',
+  'Alto Maé B',
+  'Central A',
+  'Central B',
+  'Central C',
+  'Coop',
+  'Malhangalene A',
+  'Malhangalene B',
+  'Polana-Cimento A',
+  'Polana-Cimento B',
+  'Sommerschield',
+  // Nlhamankulu
+  'Aeroporto A',
+  'Aeroporto B',
+  'Chamanculo A',
+  'Chamanculo B',
+  'Chamanculo C',
+  'Chamanculo D',
+  'Malanga',
+  'Minkadjuine',
+  'Munhuana',
+  'Unidade 7',
+  'Xipamanine',
+  // KaMaxaquene
+  'Mafalala',
+  'Maxaquene A',
+  'Maxaquene B',
+  'Maxaquene C',
+  'Maxaquene D',
+  'Polana Caniço A',
+  'Polana Caniço B',
+  'Urbanização',
+  // KaMavota
+  'Mavalane A',
+  'Mavalane B',
+  'FPLM',
+  'Hulene A',
+  'Hulene B',
+  'Ferroviário',
+  'Laulane',
+  '3 de Fevereiro',
+  'Mahotas',
+  'Albazine',
+  'Costa do Sol',
+  // KaMubukwana
+  '25 de Junho A',
+  '25 de Junho B',
+  'Bagamoyo',
+  'George Dimitrov',
+  'Inhagóia A',
+  'Inhagóia B',
+  'Jardim',
+  'Luís Cabral',
+  'Magoanine A',
+  'Magoanine B',
+  'Magoanine C',
+  'Malhazine',
+  'Nsalene',
+  'Zimpeto',
+  // KaTembe
+  'Gwachene',
+  'Chali',
+  'Inguide',
+  'Ncassene',
+  'Xamissava',
+  // KaNyaka
+  'Ribzwene',
+  'Inguane',
+  'Nhanquene'
+];
+
+export const CIDADES_BAIRROS: Record<string, string[]> = {
+  'Quelimane': QUELIMANE_BAIRROS,
+  'Maputo Cidade': MAPUTO_BAIRROS
+};
+
+export function getBairrosPorCidade(cidade?: string): string[] {
+  if (!cidade || cidade === 'Todas' || cidade === 'Todas as Cidades') {
+    // Array com bairros únicos de todas as cidades
+    return Array.from(new Set([...QUELIMANE_BAIRROS, ...MAPUTO_BAIRROS])).sort();
+  }
+  return CIDADES_BAIRROS[cidade] || QUELIMANE_BAIRROS;
+}
+
 
 export const INITIAL_CATEGORIES: Category[] = [
   {
@@ -231,6 +325,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 800,
     priceType: 'starting_at',
     bairro: 'Centro da Cidade',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800',
       'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=800'
@@ -260,6 +355,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 1200,
     priceType: 'starting_at',
     bairro: 'Brandão',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&q=80&w=800',
       'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80&w=800'
@@ -289,6 +385,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 65000,
     priceType: 'fixed',
     bairro: 'Sinacura',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&q=80&w=800',
       'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&q=80&w=800'
@@ -317,6 +414,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 1500,
     priceType: 'fixed',
     bairro: 'Chuabo Dembe',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800'
     ],
@@ -344,6 +442,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 1000,
     priceType: 'starting_at',
     bairro: 'Aeroporto',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800'
     ],
@@ -372,6 +471,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 700,
     priceType: 'starting_at',
     bairro: 'Sangariveira',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&q=80&w=800'
     ],
@@ -387,6 +487,65 @@ export const INITIAL_ADS: Ad[] = [
     updatedAt: '2026-07-11T13:40:00Z'
   },
   {
+    id: 'ad_9',
+    userId: 'usr_saide',
+    title: 'Apartamento T2 Climatizado em Polana-Cimento A (Aluguer) - Vista Baía',
+    slug: 'apartamento-t2-climatizado-em-polana-cimento-a',
+    description: 'Excelente apartamento T2 para aluguer no bairro Polana-Cimento A em Maputo Cidade. 2 quartos com guarda-fatos, sala ampla, cozinha equipada, varanda com vista para a Baía de Maputo, gerador automático e segurança 24h.\n\nLigue para agendar visitas: 863304793 / 869041261.',
+    listingType: 'produto',
+    categoryId: 'cat_prod_imoveis',
+    categoryName: 'Imóveis e Alugueres',
+    subcategory: 'Casas e Apartamentos',
+    price: 45000,
+    priceType: 'fixed',
+    bairro: 'Polana-Cimento A',
+    city: 'Maputo Cidade',
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=800'
+    ],
+    coverImage: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800',
+    phone: '+258 86 330 4793',
+    whatsapp: '258863304793',
+    status: 'active',
+    isFeatured: true,
+    featuredUntil: '2026-08-30T00:00:00Z',
+    viewsCount: 340,
+    contactsCount: 82,
+    expiresAt: '2026-08-28T00:00:00Z',
+    createdAt: '2026-07-20T10:00:00Z',
+    updatedAt: '2026-07-20T10:00:00Z'
+  },
+  {
+    id: 'ad_10',
+    userId: 'usr_amina',
+    title: 'Assistência Técnica de AC e Refrigeração em Sommerschield e Maputo',
+    slug: 'assistencia-tecnica-de-ac-e-refrigeracao-maputo',
+    description: 'Serviço profissional de instalação, recarga de gás R22/R410a, manutenção preventiva e reparação de ar condicionado residencial e comercial em Sommerschield, Coop e Central. Atendimento rápido e garantido.\n\nContacto direto: 869041261 / 863304793.',
+    listingType: 'servico',
+    categoryId: 'cat_serv_obras',
+    categoryName: 'Construção e Obras',
+    subcategory: 'Eletricistas',
+    price: 1500,
+    priceType: 'starting_at',
+    bairro: 'Sommerschield',
+    city: 'Maputo Cidade',
+    images: [
+      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800'
+    ],
+    coverImage: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=800',
+    phone: '+258 86 904 1261',
+    whatsapp: '258869041261',
+    status: 'active',
+    isFeatured: true,
+    featuredUntil: '2026-08-30T00:00:00Z',
+    viewsCount: 280,
+    contactsCount: 52,
+    expiresAt: '2026-08-28T00:00:00Z',
+    createdAt: '2026-07-22T11:00:00Z',
+    updatedAt: '2026-07-22T11:00:00Z'
+  },
+  {
     id: 'ad_11',
     userId: 'usr_saide',
     title: 'Telemóvel Samsung Galaxy A24 (128GB/6GB) - Seminovo com Garantia',
@@ -399,6 +558,7 @@ export const INITIAL_ADS: Ad[] = [
     price: 12500,
     priceType: 'fixed',
     bairro: '25 de Junho',
+    city: 'Quelimane',
     images: [
       'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&q=80&w=800'
     ],

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Search, Filter, MapPin, SlidersHorizontal, RotateCcw, Sparkles } from 'lucide-react';
 import { Category } from '../../lib/types';
-import { QUELIMANE_BAIRROS } from '../../lib/data/initialData';
+import { MOZAMBIQUE_CIDADES, getBairrosPorCidade } from '../../lib/data/initialData';
 
 interface AdFilterBarProps {
   categories: Category[];
@@ -13,6 +13,8 @@ interface AdFilterBarProps {
   setSelectedCategory: (catId: string) => void;
   selectedSubcategory: string;
   setSelectedSubcategory: (sub: string) => void;
+  selectedCity?: string;
+  setSelectedCity?: (city: string) => void;
   selectedBairro: string;
   setSelectedBairro: (bairro: string) => void;
   selectedType: string;
@@ -34,6 +36,8 @@ export default function AdFilterBar({
   setSelectedCategory,
   selectedSubcategory,
   setSelectedSubcategory,
+  selectedCity,
+  setSelectedCity,
   selectedBairro,
   setSelectedBairro,
   selectedType,
@@ -47,6 +51,7 @@ export default function AdFilterBar({
   onReset
 }: AdFilterBarProps) {
   const currentCategoryObj = categories.find(c => c.id === selectedCategory);
+  const bairrosDisponiveis = getBairrosPorCidade(selectedCity);
 
   return (
     <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
@@ -55,7 +60,7 @@ export default function AdFilterBar({
       <div className="relative w-full">
         <input
           type="text"
-          placeholder="Pesquisar por título, palavra-chave ou serviço em Quelimane..."
+          placeholder="Pesquisar por título, palavra-chave, serviço ou produto em Quelimane & Maputo..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition"
@@ -64,7 +69,7 @@ export default function AdFilterBar({
       </div>
 
       {/* Select Filters Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         
         {/* Listing Type Filter */}
         <div>
@@ -105,16 +110,34 @@ export default function AdFilterBar({
           </select>
         </div>
 
+        {/* City Filter */}
+        <div>
+          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cidade</label>
+          <select
+            value={selectedCity || ''}
+            onChange={(e) => {
+              if (setSelectedCity) setSelectedCity(e.target.value);
+              setSelectedBairro('');
+            }}
+            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+          >
+            <option value="">Todas as Cidades</option>
+            {MOZAMBIQUE_CIDADES.map(c => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Bairro Filter */}
         <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Bairro em Quelimane</label>
+          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Bairro</label>
           <select
             value={selectedBairro}
             onChange={(e) => setSelectedBairro(e.target.value)}
             className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600"
           >
             <option value="">Todos os Bairros</option>
-            {QUELIMANE_BAIRROS.map(b => (
+            {bairrosDisponiveis.map(b => (
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
@@ -194,7 +217,7 @@ export default function AdFilterBar({
       )}
 
       {/* Reset Filter Button */}
-      {(searchQuery || selectedCategory || selectedSubcategory || selectedBairro || selectedType !== 'ambos' || sortBy !== 'recent' || minPrice || maxPrice) && (
+      {(searchQuery || selectedCategory || selectedSubcategory || selectedCity || selectedBairro || selectedType !== 'ambos' || sortBy !== 'recent' || minPrice || maxPrice) && (
         <div className="pt-2 flex justify-end">
           <button
             onClick={onReset}

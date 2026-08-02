@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { UserPlus, CheckCircle2 } from 'lucide-react';
 import { initializeStore, registerUser } from '../../lib/store';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
-import { QUELIMANE_BAIRROS } from '../../lib/data/initialData';
+import { MOZAMBIQUE_CIDADES, getBairrosPorCidade } from '../../lib/data/initialData';
 import { useToast } from '../../components/ui/Toast';
 import { GoogleLoginButton } from '../../components/auth/GoogleLoginButton';
 
@@ -18,7 +18,8 @@ export default function CadastroPage() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
-  const [bairro, setBairro] = useState(QUELIMANE_BAIRROS[0]);
+  const [city, setCity] = useState('Quelimane');
+  const [bairro, setBairro] = useState('');
   const [password, setPassword] = useState('');
   const [bio, setBio] = useState('');
 
@@ -39,6 +40,7 @@ export default function CadastroPage() {
     }
 
     setSubmitting(true);
+    const finalBairro = bairro || getBairrosPorCidade(city)[0];
 
     if (isSupabaseConfigured && supabase) {
       try {
@@ -50,7 +52,8 @@ export default function CadastroPage() {
               name: name.trim(),
               phone: phone.trim(),
               whatsapp: whatsapp.trim() || phone.trim(),
-              bairro,
+              bairro: finalBairro,
+              city,
               bio: bio.trim()
             }
           }
@@ -70,8 +73,8 @@ export default function CadastroPage() {
             email: email.trim(),
             phone: phone.trim(),
             whatsapp: whatsapp.trim() || phone.trim(),
-            bairro,
-            city: 'Quelimane',
+            bairro: finalBairro,
+            city,
             bio: bio.trim() || 'Utilizador do Mussika Online',
             role: 'user',
             plan: 'free'
@@ -83,7 +86,8 @@ export default function CadastroPage() {
             email: email.trim(),
             phone: phone.trim(),
             whatsapp: whatsapp.trim() || phone.trim(),
-            bairro,
+            bairro: finalBairro,
+            city,
             bio: bio.trim()
           });
 
@@ -104,7 +108,8 @@ export default function CadastroPage() {
         email: email.trim(),
         phone: phone.trim(),
         whatsapp: whatsapp.trim() || phone.trim(),
-        bairro,
+        bairro: finalBairro,
+        city,
         bio: bio.trim()
       });
 
@@ -178,29 +183,47 @@ export default function CadastroPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Bairro em Quelimane:</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Cidade:</label>
               <select
-                value={bairro}
-                onChange={(e) => setBairro(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                value={city}
+                onChange={(e) => {
+                  const newCity = e.target.value;
+                  setCity(newCity);
+                  const newBairros = getBairrosPorCidade(newCity);
+                  setBairro(newBairros[0] || '');
+                }}
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
               >
-                {QUELIMANE_BAIRROS.map(b => (
-                  <option key={b} value={b}>{b}</option>
+                {MOZAMBIQUE_CIDADES.map(c => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Palavra-passe:</label>
-              <input
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600"
-                required
-              />
+              <label className="block text-xs font-bold text-slate-700 mb-1">Bairro:</label>
+              <select
+                value={bairro}
+                onChange={(e) => setBairro(e.target.value)}
+                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                {getBairrosPorCidade(city).map(b => (
+                  <option key={b} value={b}>{b}</option>
+                ))}
+              </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Palavra-passe:</label>
+            <input
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              required
+            />
           </div>
 
           <div>

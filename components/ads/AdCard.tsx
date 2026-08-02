@@ -156,7 +156,9 @@ export default function AdCard({ ad, onContactClick }: AdCardProps) {
           <div className="flex items-center justify-between text-xs text-slate-600">
             <div className="flex items-center gap-1 text-slate-600 font-medium">
               <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span className="truncate max-w-[140px]">{ad.bairro}</span>
+              <span className="truncate max-w-[170px]" title={`${ad.bairro}${ad.city ? `, ${ad.city}` : ''}`}>
+                {ad.bairro}{ad.city ? `, ${ad.city}` : ''}
+              </span>
             </div>
 
             {avgRating && (

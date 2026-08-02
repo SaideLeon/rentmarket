@@ -54,6 +54,7 @@ export interface Ad {
   subcategory: string;
   price: number | null; // null means 'A combinar'
   priceType: 'fixed' | 'negotiable' | 'starting_at';
+  city?: string;
   bairro: string;
   images: string[];
   coverImage: string;

@@ -24,6 +24,7 @@ function ListingsContent() {
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams?.get('cat') || '');
   const [selectedSubcategory, setSelectedSubcategory] = useState(searchParams?.get('sub') || '');
+  const [selectedCity, setSelectedCity] = useState(searchParams?.get('cidade') || '');
   const [selectedBairro, setSelectedBairro] = useState(searchParams?.get('bairro') || '');
   const [selectedType, setSelectedType] = useState(searchParams?.get('type') || 'ambos');
   const [minPrice, setMinPrice] = useState(searchParams?.get('minPrice') || '');
@@ -53,6 +54,7 @@ function ListingsContent() {
       searchQuery,
       categoryId: selectedCategory || undefined,
       subcategory: selectedSubcategory || undefined,
+      city: selectedCity || undefined,
       bairro: selectedBairro || undefined,
       listingType: selectedType === 'ambos' ? undefined : selectedType,
       minPrice: minPrice ? Number(minPrice) : undefined,
@@ -64,12 +66,13 @@ function ListingsContent() {
       if (active) setFilteredAds(ads);
     });
     return () => { active = false; };
-  }, [searchQuery, selectedCategory, selectedSubcategory, selectedBairro, selectedType, minPrice, maxPrice, sortBy, isFeatured]);
+  }, [searchQuery, selectedCategory, selectedSubcategory, selectedCity, selectedBairro, selectedType, minPrice, maxPrice, sortBy, isFeatured]);
 
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('');
     setSelectedSubcategory('');
+    setSelectedCity('');
     setSelectedBairro('');
     setSelectedType('ambos');
     setMinPrice('');
@@ -85,10 +88,10 @@ function ListingsContent() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Anúncios em Quelimane
+            Anúncios em {selectedCity || 'Quelimane & Maputo'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 font-medium">
-            Mostrando <span className="font-bold text-emerald-700">{filteredAds.length}</span> anúncio(s) ativo(s) na cidade
+            Mostrando <span className="font-bold text-emerald-700">{filteredAds.length}</span> anúncio(s) ativo(s)
           </p>
         </div>
 
@@ -134,6 +137,8 @@ function ListingsContent() {
         setSelectedCategory={setSelectedCategory}
         selectedSubcategory={selectedSubcategory}
         setSelectedSubcategory={setSelectedSubcategory}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
         selectedBairro={selectedBairro}
         setSelectedBairro={setSelectedBairro}
         selectedType={selectedType}
