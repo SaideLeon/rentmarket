@@ -32,7 +32,7 @@ import { initializeStore, getAds, getAdsAsync, getCategories } from '../lib/stor
 import { Ad, Category } from '../lib/types';
 import AdCard from '../components/ads/AdCard';
 import ContactModal from '../components/ads/ContactModal';
-import { QUELIMANE_BAIRROS } from '../lib/data/initialData';
+import { QUELIMANE_BAIRROS, MAPUTO_BAIRROS } from '../lib/data/initialData';
 import { useToast } from '../components/ui/Toast';
 import Lightfall from '../components/Lightfall';
 
@@ -61,6 +61,7 @@ export default function HomePage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBairro, setSelectedBairro] = useState('');
+  const [selectedCityBairroTab, setSelectedCityBairroTab] = useState<'Quelimane' | 'Maputo Cidade'>('Quelimane');
   const [activeTab, setActiveTab] = useState<'todos' | 'servico' | 'produto'>('todos');
 
   const [selectedAdForContact, setSelectedAdForContact] = useState<Ad | null>(null);
@@ -207,16 +208,16 @@ export default function HomePage() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/80 border border-emerald-700/60 text-emerald-300 text-xs font-semibold shadow-lg">
             <MapPin className="w-4 h-4 text-emerald-400" />
-            <span>O Ponto de Encontro da Cidade de Quelimane</span>
+            <span>O Ponto de Encontro em Quelimane e Maputo</span>
           </div>
 
           {/* Main Headline */}
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight max-w-3xl mx-auto">
-            Encontre Serviços e Produtos Locais em <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">Quelimane</span>
+            Encontre Serviços e Produtos Locais em <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-amber-300">Quelimane e Maputo</span>
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed font-normal">
-            Ligue-se diretamente a eletricistas, cabeleireiros, explicadores, costureiras, pescadores de Zalala e comerciantes de todos os bairros. Sem intermediários, fácil e no seu telemóvel.
+            Ligue-se diretamente a eletricistas, cabeleireiros, explicadores, costureiras, transporte e comerciantes de todos os bairros de Quelimane e Maputo Cidade. Sem intermediários, fácil e no seu telemóvel.
           </p>
 
           {/* Listening Indicator Banner */}
@@ -439,21 +440,51 @@ export default function HomePage() {
 
       {/* POPULAR BAIRROS SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-emerald-900 to-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl space-y-6">
-          <div className="max-w-xl space-y-2">
-            <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Mapeamento Local</span>
-            <h2 className="text-2xl sm:text-3xl font-black">Anúncios por Bairro de Quelimane</h2>
-            <p className="text-xs sm:text-sm text-slate-300">
-              Procure prestadores de serviço e vendedores diretamente no seu próprio bairro para reparações e entregas rápidas.
-            </p>
+        <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-emerald-950 text-white rounded-3xl p-8 sm:p-12 shadow-xl space-y-6 border border-emerald-800/40">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="max-w-xl space-y-2">
+              <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Mapeamento Local</span>
+              <h2 className="text-2xl sm:text-3xl font-black">Anúncios por Bairro e Distrito</h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Explore e encontre anúncios de serviços e produtos organizados por bairro e distrito em <strong className="text-white">Quelimane</strong> e na <strong className="text-white">Cidade de Maputo</strong>.
+              </p>
+            </div>
+
+            {/* City Selector Buttons */}
+            <div className="flex bg-slate-800/80 p-1 rounded-2xl border border-white/10 shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelectedCityBairroTab('Quelimane')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                  selectedCityBairroTab === 'Quelimane'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Quelimane</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedCityBairroTab('Maputo Cidade')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                  selectedCityBairroTab === 'Maputo Cidade'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                <MapPin className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Maputo Cidade</span>
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
-            {QUELIMANE_BAIRROS.map(b => (
+          <div className="flex flex-wrap gap-2.5 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            {(selectedCityBairroTab === 'Quelimane' ? QUELIMANE_BAIRROS : MAPUTO_BAIRROS).map(b => (
               <Link
                 key={b}
-                href={`/anuncios?bairro=${encodeURIComponent(b)}`}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-emerald-600/80 text-white border border-white/10 text-xs font-bold transition flex items-center gap-1.5"
+                href={`/anuncios?bairro=${encodeURIComponent(b)}&cidade=${encodeURIComponent(selectedCityBairroTab)}`}
+                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-emerald-600/80 text-white border border-white/10 text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
               >
                 <MapPin className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{b}</span>

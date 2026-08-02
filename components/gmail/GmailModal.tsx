@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   UserCheck
 } from 'lucide-react';
-import { initAuth, googleSignIn, mockGoogleSignIn, logoutGoogle, getAccessToken } from '../../lib/firebase';
+import { initAuth, googleSignIn, logoutGoogle, getAccessToken } from '../../lib/firebase';
 import { sendGmailEmail, listGmailMessages, getGmailProfile, GmailMessageSummary } from '../../lib/gmail';
 import { useToast } from '../ui/Toast';
 import { User } from 'firebase/auth';
@@ -133,23 +133,14 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
       }
     } catch (err: any) {
       if (err?.code === 'auth/configuration-not-found' || err?.message?.includes('configuration-not-found')) {
-        setAuthConfigError('O fornecedor Google de Autenticação não está ativo na Consola Firebase (mussika-fc4fb). Pode utilizar a Conta Demo para testar a interface de e-mails.');
-        showToast('Ative a Autenticação Google no Firebase Console ou use a Conta Demo.', 'info');
+        setAuthConfigError('O fornecedor Google de Autenticação não está ativo na Consola Firebase. Por favor ative a autenticação Google no Firebase Console.');
+        showToast('Ative a Autenticação Google no Firebase Console.', 'info');
       } else {
         showToast('Falha ao autenticar com o Google: ' + (err.message || 'Tente novamente'), 'error');
       }
     } finally {
       setIsAuthenticating(false);
     }
-  };
-
-  const handleDemoGoogleLogin = () => {
-    const result = mockGoogleSignIn('saideomarsaideleon@gmail.com', 'Saíde Omar (Demo)');
-    setGoogleUser(result.user);
-    setAccessTokenState(result.accessToken);
-    setGmailAddress('saideomarsaideleon@gmail.com');
-    setAuthConfigError(null);
-    showToast('Sessão de demonstração do Gmail iniciada com sucesso!', 'success');
   };
 
   const handleLogout = async () => {
@@ -339,15 +330,6 @@ export default function GmailModal({ onClose, initialTo = '', initialSubject = '
                 >
                   <Sparkles className="w-3.5 h-3.5 fill-red-200" />
                   <span>{isAuthenticating ? 'A ligar...' : 'Entrar com Google (Firebase)'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDemoGoogleLogin}
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-sm transition inline-flex items-center gap-2"
-                >
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Entrar com Conta Demo</span>
                 </button>
               </div>
             </div>

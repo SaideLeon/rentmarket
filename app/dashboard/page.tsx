@@ -197,7 +197,7 @@ function DashboardContent() {
 
     const receiverName = lastMsg?.senderId === user.id ? lastMsg.receiverName || 'Utilizador' : lastMsg.senderName || 'Utilizador';
     const adTitle = lastMsg?.adTitle || 'Contacto no Mussika Online';
-    const adId = lastMsg?.adId || 'ad_1';
+    const adId = lastMsg?.adId || '';
 
     await sendMessageAsync({
       adId,

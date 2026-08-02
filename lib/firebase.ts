@@ -110,23 +110,6 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
   }
 };
 
-export const mockGoogleSignIn = (
-  email = 'usuario.demo@gmail.com',
-  displayName = 'Utilizador Demo Google'
-): { user: User; accessToken: string } => {
-  const mockUser = {
-    uid: 'google_demo_usr_' + Date.now(),
-    email,
-    displayName,
-    photoURL: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200',
-    emailVerified: true,
-  } as unknown as User;
-
-  const mockToken = 'mock_google_access_token_' + Date.now();
-  cachedAccessToken = mockToken;
-  return { user: mockUser, accessToken: mockToken };
-};
-
 export const getAccessToken = (): string | null => {
   return cachedAccessToken;
 };

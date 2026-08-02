@@ -145,10 +145,10 @@ export async function syncStoreWithSupabase() {
       getSettingsFromSupabase()
     ]);
 
-    if (ads && ads.length > 0) {
+    if (ads) {
       setStorage(STORE_KEYS.ADS, ads);
     }
-    if (users && users.length > 0) {
+    if (users) {
       setStorage(STORE_KEYS.USERS, users);
     }
     if (settings) {
