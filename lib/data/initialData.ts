@@ -1,8 +1,21 @@
 import { Ad, Category, UserProfile, Review, SystemSettings } from '../types';
 
 export const MOZAMBIQUE_CIDADES = [
+  'Maputo Cidade',
+  'Matola',
+  'Beira',
+  'Nampula',
   'Quelimane',
-  'Maputo Cidade'
+  'Tete',
+  'Pemba',
+  'Chimoio',
+  'Nacala',
+  'Inhambane',
+  'Xai-Xai',
+  'Lichinga',
+  'Mocuba',
+  'Gurúè',
+  'Maxixe'
 ] as const;
 
 export type CidadeName = typeof MOZAMBIQUE_CIDADES[number];
@@ -131,15 +144,86 @@ export const MAPUTO_BAIRROS = [
   'Nhanquene'
 ];
 
+export const MATOLA_BAIRROS = [
+  'Matola A', 'Matola B', 'Matola C', 'Matola D', 'Matola Rio', 'Machava', 'Fomento', 'Liberdade',
+  'Infulene', 'Trevo', 'Tchumene', 'Matola Gare', 'Khongolote', 'Mussumbuluco', 'Malhampsene',
+  'Nkobe', 'Ndlavela', 'Bunhiça', 'Tsalala'
+];
+
+export const BEIRA_BAIRROS = [
+  'Central / Ponta Gêa', 'Macuti', 'Maquinino', 'Chota', 'Munhava', 'Manga', 'Inhamízua',
+  'Esturro', 'Matacuane', 'Maraza', 'Gotite', 'Alto da Manga', 'Chipangara', 'Vila Massane'
+];
+
+export const NAMPULA_BAIRROS = [
+  'Central', 'Muhala', 'Muatala', 'Namutequeliua', 'Natikiri', 'Carrupeia', 'Napipine',
+  'Marrere', 'Namicopo', 'Muahivire'
+];
+
+export const TETE_BAIRROS = [
+  'Centro da Cidade', 'Matundo', 'Mchinga', 'Francisco Manyanga', 'Samora Machel',
+  'Josina Machel', 'Degue', 'Mateus Sansão Muthemba', 'Chingodzi'
+];
+
+export const PEMBA_BAIRROS = [
+  'Cariacó', 'Natite', 'Paquitequete', 'Wimbe', 'Alto Gigone', 'Eduardo Mondlane',
+  'Chuiba', 'Murrebue', 'Ingonane'
+];
+
+export const CHIMOIO_BAIRROS = [
+  'Centro da Cidade', 'Eduardo Mondlane', 'Francisco Manyanga', '25 de Setembro',
+  'Chimoio 1', 'Chimoio 2', 'Nhamaonha', 'Vanduzi'
+];
+
+export const NACALA_BAIRROS = [
+  'Mathía', 'Triângulo', 'Muanona', 'Quissimajulo', 'Nacala Porto', 'Mahelene'
+];
+
+export const INHAMBANE_BAIRROS = [
+  'Balane', 'Chalambe', 'Josina Machel', 'Liberdade', 'Muelé', 'Salela', 'Guiúa'
+];
+
+export const XAI_XAI_BAIRROS = [
+  'Centro', 'Praia do Xai-Xai', 'Inhamissa', 'Tavene', 'Marien Ngouabi', 'Patrice Lumumba', 'Chilaulene'
+];
+
+export const LICHINGA_BAIRROS = [
+  'Central', 'Sanjur', 'Ruarua', 'Massengar', 'Chiuaula', 'Mualadzi'
+];
+
+export const MOCUBA_BAIRROS = [
+  'Central', 'Aeroporto', 'Marmanelo', 'CFM', 'Vila Nova'
+];
+
+export const GURUE_BAIRROS = [
+  'Central', 'Mualua', 'Monte Gurúè', 'Nipive'
+];
+
+export const MAXIXE_BAIRROS = [
+  'Chambone', 'Rumbana', 'Maxixe Central', 'Agostinho Neto', 'Bembe'
+];
+
 export const CIDADES_BAIRROS: Record<string, string[]> = {
+  'Maputo Cidade': MAPUTO_BAIRROS,
+  'Matola': MATOLA_BAIRROS,
+  'Beira': BEIRA_BAIRROS,
+  'Nampula': NAMPULA_BAIRROS,
   'Quelimane': QUELIMANE_BAIRROS,
-  'Maputo Cidade': MAPUTO_BAIRROS
+  'Tete': TETE_BAIRROS,
+  'Pemba': PEMBA_BAIRROS,
+  'Chimoio': CHIMOIO_BAIRROS,
+  'Nacala': NACALA_BAIRROS,
+  'Inhambane': INHAMBANE_BAIRROS,
+  'Xai-Xai': XAI_XAI_BAIRROS,
+  'Lichinga': LICHINGA_BAIRROS,
+  'Mocuba': MOCUBA_BAIRROS,
+  'Gurúè': GURUE_BAIRROS,
+  'Maxixe': MAXIXE_BAIRROS
 };
 
 export function getBairrosPorCidade(cidade?: string): string[] {
   if (!cidade || cidade === 'Todas' || cidade === 'Todas as Cidades') {
-    // Array com bairros únicos de todas as cidades
-    return Array.from(new Set([...QUELIMANE_BAIRROS, ...MAPUTO_BAIRROS])).sort();
+    return Array.from(new Set(Object.values(CIDADES_BAIRROS).flat())).sort();
   }
   return CIDADES_BAIRROS[cidade] || QUELIMANE_BAIRROS;
 }

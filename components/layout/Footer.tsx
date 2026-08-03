@@ -31,7 +31,7 @@ export default function Footer() {
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-slate-200 rounded-lg text-xs font-semibold">
                 <MapPin className="w-4 h-4 text-emerald-400" />
-                <span>Quelimane, Moçambique</span>
+                <span>Moçambique (Maputo, Beira, Nampula, Quelimane e todas províncias)</span>
               </div>
               <button
                 onClick={() => triggerPwaInstall()}
@@ -101,7 +101,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/termos" className="hover:text-emerald-400 transition">
-                  Dicas de Segurança em Quelimane
+                  Dicas de Segurança em Moçambique
                 </Link>
               </li>
               <li>
@@ -131,7 +131,7 @@ export default function Footer() {
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Negociações Diretas e Seguras</span>
               </div>
-              <p>Recomenda-se realizar encontros e pagamentos em locais públicos e movimentados de Quelimane.</p>
+              <p>Recomenda-se realizar encontros e pagamentos em locais públicos e movimentados de Moçambique.</p>
             </div>
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Mussika Online &middot; Todos os direitos reservados.
           </p>
           <div className="flex items-center gap-1">
-            <span>Desenvolvido para a comunidade de Quelimane</span>
+            <span>Desenvolvido para toda a comunidade de Moçambique</span>
           </div>
         </div>
       </div>

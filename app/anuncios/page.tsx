@@ -88,7 +88,7 @@ function ListingsContent() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Anúncios em {selectedCity || 'Quelimane & Maputo'}
+            Anúncios em {selectedCity || 'Todo o Moçambique'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 font-medium">
             Mostrando <span className="font-bold text-emerald-700">{filteredAds.length}</span> anúncio(s) ativo(s)

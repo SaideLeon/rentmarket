@@ -37,7 +37,7 @@ export default function AnunciarPage() {
   const [priceType, setPriceType] = useState<'fixed' | 'negotiable' | 'starting_at'>('fixed');
   const [priceInput, setPriceInput] = useState('');
   
-  const [city, setCity] = useState('Quelimane');
+  const [city, setCity] = useState('Maputo Cidade');
   const [bairro, setBairro] = useState('');
   const [phone, setPhone] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
@@ -63,7 +63,7 @@ export default function AnunciarPage() {
       setUser(currentUser);
       setPhone(currentUser.phone || '');
       setWhatsapp(currentUser.whatsapp || currentUser.phone || '');
-      const initialCity = currentUser.city || 'Quelimane';
+      const initialCity = currentUser.city || 'Maputo Cidade';
       setCity(initialCity);
       const bairrosList = getBairrosPorCidade(initialCity);
       setBairro(currentUser.bairro && bairrosList.includes(currentUser.bairro) ? currentUser.bairro : bairrosList[0]);
@@ -152,7 +152,7 @@ export default function AnunciarPage() {
         subcategory,
         price: numericPrice,
         priceType,
-        city: city || 'Quelimane',
+        city: city || 'Maputo Cidade',
         bairro: bairro || getBairrosPorCidade(city)[0],
         images: imageUrls.length > 0 ? imageUrls : ['https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&q=80&w=800'],
         coverImage: imageUrls[coverIndex] || imageUrls[0] || 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&q=80&w=800',

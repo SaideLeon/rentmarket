@@ -94,7 +94,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Marketplace Oficial de Quelimane &middot; Zambézia, Moçambique</span>
+            <span>Marketplace Oficial de Moçambique &middot; Todas as Províncias &amp; Cidades</span>
           </div>
 
           <div className="flex items-center gap-4 text-emerald-200">
@@ -144,7 +144,7 @@ export default function Navbar() {
 
             <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full text-xs font-bold border border-emerald-100">
               <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Quelimane</span>
+              <span>Moçambique</span>
             </div>
           </div>
 
@@ -153,7 +153,7 @@ export default function Navbar() {
             <div className="relative w-full">
               <input
                 type="text"
-                placeholder="O que você procura em Quelimane?"
+                placeholder="O que procura em Moçambique?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-100 border-transparent focus:bg-white focus:border-emerald-500 rounded-full py-2 pl-10 pr-24 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"

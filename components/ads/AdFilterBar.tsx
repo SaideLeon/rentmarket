@@ -60,7 +60,7 @@ export default function AdFilterBar({
       <div className="relative w-full">
         <input
           type="text"
-          placeholder="Pesquisar por título, palavra-chave, serviço ou produto em Quelimane & Maputo..."
+          placeholder="Pesquisar por título, palavra-chave, serviço ou produto em todo Moçambique..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition"

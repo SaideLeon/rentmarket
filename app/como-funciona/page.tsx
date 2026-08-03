@@ -54,8 +54,8 @@ export default function ComoFuncionaPage() {
       answer: 'O Mussika Online é uma PWA (Progressive Web App). Pode clicar no botão "Instalar App Android" no menu superior ou no rodapé, ou aceder ao menu do seu navegador (três pontos) e selecionar "Instalar Aplicação" / "Adicionar ao Ecrã Principal".'
     },
     {
-      question: 'Quais são os bairros cobertos pela plataforma em Quelimane?',
-      answer: 'Cobrimos os bairros oficiais da cidade de Quelimane, incluindo Central, Coalane, Aeroporto, 24 de Julho, Chuabo Dembe, Ícidua, Sangariveira, Sinacura, Torrone, Floresta, Manhaua, Micajune, Sampene, Maquival e zonas limítrofes.'
+      question: 'Quais são as cidades e bairros cobertos pelo Mussika Online em Moçambique?',
+      answer: 'Cobrimos todas as principais cidades e províncias de Moçambique, incluindo Maputo Cidade, Matola, Beira, Nampula, Quelimane, Tete, Pemba, Inhambane, Chimoio, Lichinga, Xai-Xai, Nacala e respectivos bairros.'
     }
   ];
 

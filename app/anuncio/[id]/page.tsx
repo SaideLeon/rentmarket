@@ -134,7 +134,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
         <div className="hidden sm:flex items-center gap-1.5 text-slate-400">
           <Link href="/" className="hover:text-slate-700">Início</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/anuncios" className="hover:text-slate-700">Quelimane</Link>
+          <Link href="/anuncios" className="hover:text-slate-700">{ad.city || 'Moçambique'}</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-slate-700 font-bold truncate max-w-[200px]">{ad.categoryName || 'Geral'}</span>
         </div>
@@ -223,7 +223,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
               <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500 pt-1 border-t border-slate-100">
                 <span className="flex items-center gap-1 font-semibold text-slate-700">
                   <MapPin className="w-4 h-4 text-emerald-600" />
-                  {ad.bairro}, Quelimane
+                  {ad.bairro}, {ad.city || 'Moçambique'}
                 </span>
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4 text-slate-400" />
@@ -371,7 +371,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
                     )}
                   </div>
                   <p className="text-xs text-slate-500 font-medium">
-                    {ad.user?.bairro || ad.bairro}, Quelimane
+                    {ad.user?.bairro || ad.bairro}, {ad.user?.city || ad.city || 'Moçambique'}
                   </p>
                 </div>
               </div>
@@ -395,7 +395,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
             <div className="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-amber-950">
                 <ShieldCheck className="w-4 h-4 text-amber-600" />
-                <span>Negociação Segura em Quelimane</span>
+                <span>Negociação Segura em Moçambique</span>
               </div>
               <p className="leading-relaxed text-[11px]">
                 Encontre-se em locais públicos e movimentados para verificar o item ou serviço antes de realizar transferências móveis (M-Pesa / e-Mola).
@@ -411,7 +411,7 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
       {/* RELATED ADS */}
       {relatedAds.length > 0 && (
         <section className="pt-8 border-t border-slate-200 space-y-6">
-          <h2 className="text-xl font-bold text-slate-900">Anúncios Relacionados em Quelimane</h2>
+          <h2 className="text-xl font-bold text-slate-900">Anúncios Relacionados em {ad.city || 'Moçambique'}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {relatedAds.map(relAd => (
               <AdCard key={relAd.id} ad={relAd} />
