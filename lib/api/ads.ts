@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured, isValidUuid } from '../supabase';
 import { Ad, AdStatus } from '../types';
+import { INITIAL_CATEGORIES } from '../data/initialData';
 
 export function mapAdFromDb(row: any): Ad {
   return {
@@ -114,6 +115,43 @@ export async function createAdInSupabase(
     const userId = user?.id || adData.userId;
 
     const slug = adData.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+
+    // Assegurar que a categoria existe na tabela public.categories do Supabase para não violar a FK
+    if (adData.categoryId) {
+      try {
+        const { data: existingCat } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('id', adData.categoryId)
+          .maybeSingle();
+
+        if (!existingCat) {
+          const catObj = INITIAL_CATEGORIES.find(c => c.id === adData.categoryId) || {
+            id: adData.categoryId,
+            name: adData.categoryName || 'Geral',
+            slug: (adData.categoryName || adData.categoryId).toLowerCase().replace(/[^a-z0-9]/g, '-'),
+            icon: 'Tag',
+            type: adData.listingType || 'ambos',
+            subcategories: adData.subcategory ? [adData.subcategory] : []
+          };
+
+          const { error: catErr } = await supabase.from('categories').upsert({
+            id: catObj.id,
+            name: catObj.name,
+            slug: catObj.slug,
+            icon: catObj.icon,
+            type: catObj.type,
+            subcategories: catObj.subcategories
+          }, { onConflict: 'id' });
+
+          if (catErr) {
+            console.warn('Erro ao inserir categoria pai no Supabase:', catErr.message);
+          }
+        }
+      } catch (catException) {
+        console.warn('Exceção ao verificar/inserir categoria no Supabase:', catException);
+      }
+    }
 
     const payload = {
       user_id: userId,

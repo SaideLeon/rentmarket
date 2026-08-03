@@ -47,8 +47,26 @@ BEGIN
   )
   ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
-    email = EXCLUDED.email;
+    email = EXCLUDED.email,
+    updated_at = NOW();
   RETURN NEW;
+EXCEPTION
+  WHEN unique_violation THEN
+    -- Se o email já existe num perfil pré-existente (ex: registado por email/password antes de usar Google OAuth),
+    -- actualiza o perfil existente associando o novo auth id sem bloquear a criação da sessão no Auth
+    BEGIN
+      UPDATE public.profiles
+      SET id = NEW.id,
+          name = COALESCE(NEW.raw_user_meta_data->>'name', name),
+          avatar_url = COALESCE(NEW.raw_user_meta_data->>'avatar_url', avatar_url),
+          updated_at = NOW()
+      WHERE email = NEW.email;
+    EXCEPTION WHEN OTHERS THEN
+      NULL;
+    END;
+    RETURN NEW;
+  WHEN OTHERS THEN
+    RETURN NEW;
 END;
 $$;
 

@@ -13,6 +13,27 @@ CREATE TABLE IF NOT EXISTS public.categories (
   subcategories TEXT[] NOT NULL DEFAULT '{}'
 );
 
+-- Seed das categorias predefinidas
+INSERT INTO public.categories (id, name, slug, icon, type, subcategories) VALUES
+  ('cat_serv_obras', 'Construção e Obras', 'construcao-e-obras', 'Hammer', 'servico', ARRAY['Eletricistas', 'Canalizadores', 'Pedreiros', 'Pintores', 'Serralheiros', 'Gesso e Teto Falso']),
+  ('cat_serv_beleza', 'Beleza e Estética', 'beleza-e-estetica', 'Scissors', 'servico', ARRAY['Cabeleireiros e Barbeiros', 'Tranças e Extensões', 'Manicure e Pedicure', 'Maquilhagem', 'Massagens']),
+  ('cat_serv_aulas', 'Aulas e Explicações', 'aulas-e-explicacoes', 'GraduationCap', 'servico', ARRAY['Matemática e Física', 'Língua Portuguesa', 'Inglês', 'Informática Básica', 'Música e Instrumentos']),
+  ('cat_serv_transporte', 'Transporte e Fretes', 'transporte-e-fretes', 'Truck', 'servico', ARRAY['Fretes de Carga', 'Transporte de Mudanças', 'Táxi Privado e Txopela', 'Motorista Particular']),
+  ('cat_serv_tecnologia', 'Tecnologia e Informática', 'tecnologia-e-informatica', 'Laptop', 'servico', ARRAY['Reparação de Telemóveis', 'Reparação de Computadores', 'Instalação de Câmeras/CCTV', 'Redes e Wi-Fi', 'Design e Fotografia']),
+  ('cat_serv_gastronomia', 'Gastronomia e Festas', 'gastronomia-e-festas', 'Utensils', 'servico', ARRAY['Bolos por Encomenda', 'Catering e Buffets', 'Decoração de Eventos', 'Animação e DJ', 'Doces e Salgados']),
+  ('cat_serv_reparacoes', 'Reparações Domésticas', 'reparacoes-domesticas', 'Wrench', 'servico', ARRAY['Mecânica de Carros e Motas', 'Reparação de Geleiras/AC', 'Costura e Ajustes de Roupa', 'Jardinagem']),
+  ('cat_prod_alimentacao', 'Alimentação e Produtos Frescos', 'alimentacao-e-frescos', 'Apple', 'produto', ARRAY['Peixe Fresco e Marisco', 'Frutas e Vegetais', 'Mandioca e Matapa', 'Comida Caseira Pronta', 'Produtos Naturais']),
+  ('cat_prod_moda', 'Moda e Capulanas', 'moda-e-capulanas', 'Shirt', 'produto', ARRAY['Capulanas Originais', 'Roupas Masculinas', 'Roupas Femininas', 'Calçados', 'Acessórios e Bijuteria']),
+  ('cat_prod_eletronica', 'Eletrónica e Telemóveis', 'eletronica-e-telemoveis', 'Smartphone', 'produto', ARRAY['Telemóveis e Tablets', 'Computadores e Laptops', 'Televisores e Som', 'Acessórios e Carregadores', 'Eletrodomésticos']),
+  ('cat_prod_artesanato', 'Artesanato e Decoração', 'artesanato-e-decoracao', 'Palette', 'produto', ARRAY['Esculturas em Madeira', 'Quadros e Pinturas', 'Móveis de Bambu/Cana', 'Cestaria e Utensílios']),
+  ('cat_prod_veiculos', 'Veículos e Peças', 'veiculos-e-pecas', 'Car', 'produto', ARRAY['Motocicletas e Txopelas', 'Carros Usados', 'Bicicletas', 'Peças e Acessórios'])
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
+  icon = EXCLUDED.icon,
+  type = EXCLUDED.type,
+  subcategories = EXCLUDED.subcategories;
+
 -- 2. ANÚNCIOS
 CREATE TABLE IF NOT EXISTS public.ads (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

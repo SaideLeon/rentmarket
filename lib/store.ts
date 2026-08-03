@@ -518,7 +518,10 @@ export function incrementAdContact(id: string) {
   }
 }
 
-export function createAd(data: Omit<Ad, 'id' | 'createdAt' | 'updatedAt' | 'viewsCount' | 'contactsCount' | 'status' | 'expiresAt' | 'slug'>): Ad {
+export function createAd(
+  data: Omit<Ad, 'id' | 'createdAt' | 'updatedAt' | 'viewsCount' | 'contactsCount' | 'status' | 'expiresAt' | 'slug'>,
+  skipSupabaseSync: boolean = false
+): Ad {
   const currentUser = getCurrentUser();
   const settings = getSettings();
   const ads = getStorage<Ad[]>(STORE_KEYS.ADS, INITIAL_ADS);
@@ -544,7 +547,7 @@ export function createAd(data: Omit<Ad, 'id' | 'createdAt' | 'updatedAt' | 'view
   ads.unshift(newAd);
   setStorage(STORE_KEYS.ADS, ads);
 
-  if (isSupabaseConfigured) {
+  if (isSupabaseConfigured && !skipSupabaseSync) {
     createAdInSupabase(data, autoApprove);
   }
 
@@ -923,11 +926,29 @@ export async function getAdByIdAsync(id: string): Promise<Ad | null> {
 }
 
 export async function createAdAsync(data: Omit<Ad, 'id' | 'createdAt' | 'updatedAt' | 'viewsCount' | 'contactsCount' | 'status' | 'expiresAt' | 'slug'>): Promise<Ad> {
-  const local = createAd(data);
+  const currentUser = getCurrentUser();
+  const settings = getSettings();
+  const autoApprove = settings.autoApproveAds || (currentUser?.plan === 'pro');
+
+  let supabaseAd: Ad | null = null;
   if (isSupabaseConfigured) {
-    const created = await createAdInSupabase(data, true);
-    if (created) return created;
+    supabaseAd = await createAdInSupabase(data, autoApprove);
   }
+
+  // Grava localmente sem duplicar a chamada ao Supabase
+  const local = createAd(data, true);
+
+  if (supabaseAd) {
+    // Sincroniza a chave local para usar o registo vindo do Supabase
+    const ads = getStorage<Ad[]>(STORE_KEYS.ADS, INITIAL_ADS);
+    const idx = ads.findIndex(a => a.id === local.id);
+    if (idx !== -1) {
+      ads[idx] = supabaseAd;
+      setStorage(STORE_KEYS.ADS, ads);
+    }
+    return supabaseAd;
+  }
+
   return local;
 }
 
