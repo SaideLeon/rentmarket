@@ -29,10 +29,6 @@ export default function Footer() {
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-slate-200 rounded-lg text-xs font-semibold">
-                <MapPin className="w-4 h-4 text-emerald-400" />
-                <span>Moçambique (Maputo, Beira, Nampula, Quelimane e todas províncias)</span>
-              </div>
               <button
                 onClick={() => triggerPwaInstall()}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-semibold shadow-sm transition"

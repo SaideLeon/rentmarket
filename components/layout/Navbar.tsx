@@ -89,35 +89,6 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
-      {/* Top Banner for Local City Context (Hidden on Mobile) */}
-      <div className="hidden sm:block bg-emerald-900 text-emerald-100 text-xs py-1.5 px-4 font-medium">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Marketplace Oficial de Moçambique &middot; Todas as Províncias &amp; Cidades</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-emerald-200">
-            <button
-              onClick={() => triggerPwaInstall()}
-              className="hover:text-white transition flex items-center gap-1 font-semibold text-amber-300"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span>Instalar App Android</span>
-            </button>
-            <span>&bull;</span>
-            <Link href="/como-funciona" className="hover:text-white transition">
-              Como Funciona
-            </Link>
-            <span>&bull;</span>
-            <Link href="/planos" className="hover:text-white transition flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Destaques &amp; Planos</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12 md:h-16 gap-2 md:gap-4">

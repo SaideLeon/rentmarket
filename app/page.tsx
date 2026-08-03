@@ -402,7 +402,7 @@ export default function HomePage() {
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Recém-Publicados em Moçambique</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Recém-Publicados</h2>
             <p className="text-xs text-slate-500 font-medium">Os últimos anúncios publicados por moradores e comerciantes de todo o país</p>
           </div>
 
@@ -600,7 +600,7 @@ export default function HomePage() {
             </div>
             <div className="space-y-1">
               <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">Selo de Confiança Nacional</span>
-              <h3 className="text-xl font-bold text-amber-950">Quer tornar-se um Anunciante Verificado em Moçambique?</h3>
+              <h3 className="text-xl font-bold text-amber-950">Verificar conta</h3>
               <p className="text-xs sm:text-sm text-amber-900 leading-relaxed">
                 Envie a cópia do seu BI ou documento de identidade para revisão da equipa de moderação e ganhe o selo de verificação no seu perfil para transmitir mais segurança aos clientes.
               </p>
