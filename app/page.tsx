@@ -22,6 +22,7 @@ import {
   Smartphone, 
   Palette, 
   Car,
+  BookOpen,
   ShieldCheck,
   PhoneCall,
   Users,
@@ -48,7 +49,8 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Shirt: <Shirt className="w-6 h-6 text-emerald-600" />,
   Smartphone: <Smartphone className="w-6 h-6 text-emerald-600" />,
   Palette: <Palette className="w-6 h-6 text-emerald-600" />,
-  Car: <Car className="w-6 h-6 text-emerald-600" />
+  Car: <Car className="w-6 h-6 text-emerald-600" />,
+  BookOpen: <BookOpen className="w-6 h-6 text-emerald-600" />
 };
 
 export default function HomePage() {

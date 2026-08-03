@@ -241,6 +241,14 @@ export const INITIAL_CATEGORIES: Category[] = [
     icon: 'Car',
     type: 'produto',
     subcategories: ['Motocicletas e Txopelas', 'Carros Usados', 'Bicicletas', 'Peças e Acessórios']
+  },
+  {
+    id: 'cat_prod_infoprodutos',
+    name: 'Infoprodutos e Livros Digitais',
+    slug: 'infoprodutos-e-livros-digitais',
+    icon: 'BookOpen',
+    type: 'produto',
+    subcategories: ['E-books e Livros Digitais', 'Cursos e Formações Online', 'Templates e Documentos', 'Softwares e Scripts', 'Mentorias e Consultorias']
   }
 ];
 

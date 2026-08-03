@@ -26,7 +26,8 @@ INSERT INTO public.categories (id, name, slug, icon, type, subcategories) VALUES
   ('cat_prod_moda', 'Moda e Capulanas', 'moda-e-capulanas', 'Shirt', 'produto', ARRAY['Capulanas Originais', 'Roupas Masculinas', 'Roupas Femininas', 'Calçados', 'Acessórios e Bijuteria']),
   ('cat_prod_eletronica', 'Eletrónica e Telemóveis', 'eletronica-e-telemoveis', 'Smartphone', 'produto', ARRAY['Telemóveis e Tablets', 'Computadores e Laptops', 'Televisores e Som', 'Acessórios e Carregadores', 'Eletrodomésticos']),
   ('cat_prod_artesanato', 'Artesanato e Decoração', 'artesanato-e-decoracao', 'Palette', 'produto', ARRAY['Esculturas em Madeira', 'Quadros e Pinturas', 'Móveis de Bambu/Cana', 'Cestaria e Utensílios']),
-  ('cat_prod_veiculos', 'Veículos e Peças', 'veiculos-e-pecas', 'Car', 'produto', ARRAY['Motocicletas e Txopelas', 'Carros Usados', 'Bicicletas', 'Peças e Acessórios'])
+  ('cat_prod_veiculos', 'Veículos e Peças', 'veiculos-e-pecas', 'Car', 'produto', ARRAY['Motocicletas e Txopelas', 'Carros Usados', 'Bicicletas', 'Peças e Acessórios']),
+  ('cat_prod_infoprodutos', 'Infoprodutos e Livros Digitais', 'infoprodutos-e-livros-digitais', 'BookOpen', 'produto', ARRAY['E-books e Livros Digitais', 'Cursos e Formações Online', 'Templates e Documentos', 'Softwares e Scripts', 'Mentorias e Consultorias'])
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   slug = EXCLUDED.slug,
