@@ -465,8 +465,8 @@ export default function HomePage() {
 
       {/* POPULAR BAIRROS SECTION */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-emerald-950 text-white rounded-3xl p-5 sm:p-8 md:p-12 shadow-xl space-y-6 border border-emerald-800/40">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-emerald-950 text-white rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl space-y-6 border border-emerald-800/40 overflow-hidden">
+          <div className="space-y-4">
             <div className="max-w-xl space-y-2">
               <span className="text-xs text-emerald-400 font-bold uppercase tracking-wider">Mapeamento Nacional</span>
               <h2 className="text-2xl sm:text-3xl font-black">Anúncios por Cidade e Bairro</h2>
@@ -476,8 +476,8 @@ export default function HomePage() {
             </div>
 
             {/* City Selector Buttons & Mobile Dropdown */}
-            <div className="w-full lg:w-auto shrink-0 space-y-2">
-              <label className="block text-[11px] font-bold text-emerald-300 md:hidden uppercase tracking-wider">
+            <div className="w-full space-y-2 pt-2">
+              <label className="block text-[11px] font-bold text-emerald-300 uppercase tracking-wider">
                 Selecione a Cidade:
               </label>
 
@@ -500,20 +500,20 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Tablet & Desktop Horizontal Scrollable Pill Tabs */}
-              <div className="hidden md:flex flex-nowrap gap-1.5 bg-slate-800/80 p-1.5 rounded-2xl border border-white/10 max-w-full overflow-x-auto scrollbar-thin scrollbar-thumb-emerald-700/50 scrollbar-track-transparent pb-1">
+              {/* Tablet & Desktop Responsive Flex-Wrap Pill Tabs */}
+              <div className="hidden md:flex flex-wrap gap-2 bg-slate-800/80 p-2.5 rounded-2xl border border-white/10 w-full">
                 {MOZAMBIQUE_CIDADES.map(cidade => (
                   <button
                     key={cidade}
                     type="button"
                     onClick={() => setSelectedCityBairroTab(cidade)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                       selectedCityBairroTab === cidade
                         ? 'bg-emerald-600 text-white shadow-md'
                         : 'text-slate-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <MapPin className="w-3 h-3 text-emerald-300" />
+                    <MapPin className="w-3.5 h-3.5 text-emerald-300" />
                     <span>{cidade}</span>
                   </button>
                 ))}
