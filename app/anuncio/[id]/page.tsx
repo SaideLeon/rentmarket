@@ -28,6 +28,7 @@ import ReviewModal from '../../../components/ads/ReviewModal';
 import ReportModal from '../../../components/ads/ReportModal';
 import AdCard from '../../../components/ads/AdCard';
 import { useToast } from '../../../components/ui/Toast';
+import { prioritizeByReferral, buildAdShareLink } from '../../../lib/referral';
 
 export default function AdDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -61,9 +62,8 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
 
       // Load related ads
       const allCategoryAds = await getAdsAsync({ categoryId: loadedAd.categoryId, status: 'active' });
-      const related = allCategoryAds
-        .filter(a => a.id !== loadedAd.id)
-        .slice(0, 4);
+      const filteredRelated = allCategoryAds.filter(a => a.id !== loadedAd.id);
+      const related = prioritizeByReferral(filteredRelated).slice(0, 4);
       setRelatedAds(related);
     }
   }, [resolvedParams.id, currentUserId]);
@@ -109,14 +109,15 @@ export default function AdDetailPage({ params }: { params: Promise<{ id: string 
   };
 
   const handleShare = () => {
+    const shareUrl = buildAdShareLink(ad.userId, ad.id);
     if (navigator.share) {
       navigator.share({
         title: ad.title,
         text: `Veja este anúncio no Mussika Online: ${ad.title}`,
-        url: window.location.href
+        url: shareUrl
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(window.location.href);
+      navigator.clipboard.writeText(shareUrl);
       showToast('Link do anúncio copiado para a área de transferência!');
     }
   };

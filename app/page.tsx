@@ -36,6 +36,7 @@ import ContactModal from '../components/ads/ContactModal';
 import { QUELIMANE_BAIRROS, MAPUTO_BAIRROS } from '../lib/data/initialData';
 import { useToast } from '../components/ui/Toast';
 import Lightfall from '../components/Lightfall';
+import { prioritizeByReferral } from '../lib/referral';
 
 import { MOZAMBIQUE_CIDADES, CIDADES_BAIRROS, getBairrosPorCidade } from '@/lib/data/initialData';
 
@@ -150,14 +151,14 @@ export default function HomePage() {
     setCategories(getCategories());
     
     const feat = await getAdsAsync({ featuredOnly: true, status: 'active' });
-    setFeaturedAds(feat);
+    setFeaturedAds(prioritizeByReferral(feat));
 
     const rec = await getAdsAsync({
       listingType: activeTab === 'todos' ? undefined : activeTab,
       status: 'active',
       sortBy: 'recent'
     });
-    setRecentAds(rec.slice(0, 8));
+    setRecentAds(prioritizeByReferral(rec).slice(0, 8));
   }, [activeTab]);
 
   useEffect(() => {

@@ -9,6 +9,7 @@ import AdCard from '../../components/ads/AdCard';
 import AdFilterBar from '../../components/ads/AdFilterBar';
 import ContactModal from '../../components/ads/ContactModal';
 import Link from 'next/link';
+import { prioritizeByReferral } from '../../lib/referral';
 
 function ListingsContent() {
   const searchParams = useSearchParams();
@@ -63,7 +64,7 @@ function ListingsContent() {
       featuredOnly: isFeatured,
       status: 'active'
     }).then(ads => {
-      if (active) setFilteredAds(ads);
+      if (active) setFilteredAds(prioritizeByReferral(ads));
     });
     return () => { active = false; };
   }, [searchQuery, selectedCategory, selectedSubcategory, selectedCity, selectedBairro, selectedType, minPrice, maxPrice, sortBy, isFeatured]);

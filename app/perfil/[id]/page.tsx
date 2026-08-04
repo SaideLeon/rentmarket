@@ -10,16 +10,20 @@ import {
   Calendar, 
   MessageSquare, 
   ShieldCheck, 
-  Store 
+  Store,
+  Share2
 } from 'lucide-react';
 import { initializeStore, getAllUsers, getAds, getAdsAsync, getUserReviews, getUserReviewsAsync } from '../../../lib/store';
 import { UserProfile, Ad, Review } from '../../../lib/types';
 import AdCard from '../../../components/ads/AdCard';
 import ReviewModal from '../../../components/ads/ReviewModal';
 import ContactModal from '../../../components/ads/ContactModal';
+import { buildProfileShareLink } from '../../../lib/referral';
+import { useToast } from '../../../components/ui/Toast';
 
 export default function PublicProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+  const { showToast } = useToast();
 
   const [profileUser, setProfileUser] = useState<UserProfile | null>(null);
   const [userAds, setUserAds] = useState<Ad[]>([]);
@@ -27,6 +31,21 @@ export default function PublicProfilePage({ params }: { params: Promise<{ id: st
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [selectedAdForContact, setSelectedAdForContact] = useState<Ad | null>(null);
+
+  const handleShareProfile = () => {
+    if (!profileUser) return;
+    const shareUrl = buildProfileShareLink(profileUser.id);
+    if (navigator.share) {
+      navigator.share({
+        title: profileUser.name,
+        text: `Confira o perfil de ${profileUser.name} no Mussika Online`,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      showToast('Link do perfil copiado para a área de transferência!');
+    }
+  };
 
   const loadProfile = useCallback(async () => {
     initializeStore();
@@ -109,6 +128,13 @@ export default function PublicProfilePage({ params }: { params: Promise<{ id: st
           </div>
 
           <div className="flex items-center gap-3 self-stretch sm:self-auto">
+            <button
+              onClick={handleShareProfile}
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 transition flex items-center justify-center gap-1.5"
+            >
+              <Share2 className="w-3.5 h-3.5 text-slate-600" />
+              <span>Partilhar</span>
+            </button>
             <button
               onClick={() => setShowReviewModal(true)}
               className="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition"
